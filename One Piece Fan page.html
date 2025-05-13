@@ -1,0 +1,4368 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>One Piece Fan Base</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        /* Global Styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Arial', sans-serif;
+        }
+        
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #3cb6ee, rgb(23, 22, 22));
+            padding-top: 80px; /* avoid overlap */
+            line-height: 1.6;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        /* Slider Container */
+        .crazy-slider {
+            position: relative;
+            width: 100%;
+            height: 70vh;
+            min-height: 500px;
+            perspective: 1000px;
+            margin: 50px 0;
+        }
+
+        /* Slides */
+        .slide {
+            position: absolute;
+            width: 70%;
+            height: 80%;
+            left: 15%;
+            top: 10%;
+            transition: transform 1s, opacity 1s, z-index 0s;
+            transform-style: preserve-3d;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
+            opacity: 0.5;
+            z-index: 1;
+            background: linear-gradient(45deg, #d92323, #333);
+        }
+
+        .slide.active {
+            transform: translateZ(0) rotateY(0deg) scale(1);
+            opacity: 1;
+            z-index: 10;
+        }
+
+        .slide.prev {
+            transform: translateZ(-200px) rotateY(30deg) scale(0.8);
+            opacity: 0.7;
+            z-index: 3;
+        }
+
+        .slide.next {
+            transform: translateZ(-200px) rotateY(-30deg) scale(0.8);
+            opacity: 0.7;
+            z-index: 3;
+        }
+
+        .slide.far-prev {
+            transform: translateX(-40%) translateZ(-400px) rotateY(40deg) scale(0.6);
+            opacity: 0.3;
+            z-index: 1;
+        }
+
+        .slide.far-next {
+            transform: translateX(40%) translateZ(-400px) rotateY(-40deg) scale(0.6);
+            opacity: 0.3;
+            z-index: 1;
+        }
+
+        /* Slide Content */
+        .slide-content {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+            padding: 30px;
+            background: rgba(0, 0, 0, 0.4);
+            transition: transform 0.5s;
+        }
+
+        .slide:hover .slide-content {
+            transform: translateY(-10px);
+        }
+
+        .slide-title {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.8);
+            transform: translateY(50px);
+            opacity: 0;
+            transition: transform 0.8s, opacity 0.8s;
+        }
+
+        .slide-desc {
+            font-size: 1.1rem;
+            margin-bottom: 20px;
+            max-width: 80%;
+            transform: translateY(50px);
+            opacity: 0;
+            transition: transform 0.8s 0.2s, opacity 0.8s 0.2s;
+        }
+
+        .slide-btn {
+            display: inline-block;
+            padding: 10px 25px;
+            background: #d92323;
+            color: white;
+            text-decoration: none;
+            border-radius: 30px;
+            font-weight: bold;
+            transform: translateY(50px);
+            opacity: 0;
+            transition: transform 0.8s 0.4s, opacity 0.8s 0.4s, background 0.3s;
+            align-self: flex-start;
+        }
+
+        .slide-btn:hover {
+            background: #b51c1c;
+        }
+
+        .active .slide-title,
+        .active .slide-desc,
+        .active .slide-btn {
+            transform: translateY(0);
+            opacity: 1;
+        }
+
+        /* Navigation Arrows */
+        .slider-nav {
+            position: absolute;
+            top: 50%;
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            z-index: 100;
+            padding: 0 20px;
+        }
+
+        .nav-arrow {
+            width: 50px;
+            height: 50px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: background 0.3s;
+            backdrop-filter: blur(5px);
+        }
+
+        .nav-arrow:hover {
+            background: rgba(255, 255, 255, 0.4);
+        }
+
+        .nav-arrow i {
+            font-size: 1.5rem;
+            color: white;
+        }
+
+        /* Pagination Dots */
+        .slider-dots {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            z-index: 100;
+        }
+
+        .dot {
+            width: 12px;
+            height: 12px;
+            background: rgba(255, 255, 255, 0.5);
+            border-radius: 50%;
+            margin: 0 5px;
+            cursor: pointer;
+            transition: background 0.3s, transform 0.3s;
+        }
+
+        .dot.active {
+            background: #d92323;
+            transform: scale(1.3);
+        }
+
+        /* Animation Effects */
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        .slide.active {
+            animation: float 6s ease-in-out infinite;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .crazy-slider {
+                height: 60vh;
+                min-height: 400px;
+            }
+            
+            .slide {
+                width: 85%;
+                left: 7.5%;
+            }
+            
+            .slide-title {
+                font-size: 1.8rem;
+            }
+            
+            .slide-desc {
+                font-size: 1rem;
+                max-width: 100%;
+            }
+        }
+        
+        header {
+            background: linear-gradient(45deg, #d92323, #333);
+            color: white;
+            padding: 20px 0;
+            text-align: center;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+            position: relative;
+            z-index: 100;
+        }
+        
+        header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        }
+        .navbar {
+  position: sticky;
+  top: 0;
+  z-index: 999;
+  background: rgba(173, 216, 230, 0.3);
+  backdrop-filter: blur(12px);
+  border-radius: 2rem;
+  padding: 15px 30px;
+  margin: 10px auto;
+  width: 90%;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+  border: 1px solid rgba(173, 216, 230, 0.4);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  animation: slideDown 0.8s ease-in-out;
+  transition: all 0.4s ease-in-out;
+}
+
+/* Animation */
+@keyframes slideDown {
+  from {
+    transform: translateY(-50px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+/* Logo */
+.logo {
+  font-size: 1.8rem;
+  font-weight: bold;
+  color: #007acc;
+  text-shadow: 1px 1px 2px #fff;
+}
+
+/* Nav links */
+.nav-links {
+  list-style: none;
+  display: flex;
+  gap: 30px;
+}
+
+.nav-links li a {
+  text-decoration: none;
+  color: #007acc;
+  font-weight: 500;
+  padding: 10px 18px;
+  border-radius: 30px;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 6px rgba(0, 122, 204, 0.2);
+}
+
+.nav-links li a.active {
+    background-color: #007acc;
+    color: white;
+    transform: translateY(-3px) scale(1.05);
+    box-shadow: 0 6px 15px rgba(0, 122, 204, 0.4);
+}
+
+.nav-links li a:hover {
+  background-color: #007acc;
+  color: white;
+  transform: translateY(-3px) scale(1.05);
+  box-shadow: 0 6px 15px rgba(0, 122, 204, 0.4);
+}
+
+/* Hamburger Menu */
+.hamburger {
+  display: none;
+  flex-direction: column;
+  gap: 6px;
+  cursor: pointer;
+}
+
+.hamburger span {
+  display: block;
+  width: 25px;
+  height: 3px;
+  background-color: #007acc;
+  border-radius: 3px;
+  transition: all 0.3s ease-in-out;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .nav-links {
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 90%;
+    background-color: rgba(255, 255, 255, 0.95);
+    border-radius: 1.5rem;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+    padding: 20px 0;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+    opacity: 0;
+    pointer-events: none;
+    transition: all 0.3s ease-in-out;
+  }
+
+  .nav-links.show {
+    opacity: 1;
+    pointer-events: all;
+  }
+
+  .hamburger {
+    display: flex;
+  }
+}
+        
+
+        
+        /* Main Content */
+        .main-content {
+            display: flex;
+            margin: 20px 0;
+            min-height: calc(100vh - 300px); /* Adjust based on your header/footer height */
+        }
+        
+        .content-section {
+            flex: 3;
+            background-color: white;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            margin-right: 20px;
+        }
+        
+        .sidebar {
+            flex: 1;
+            background-color: white;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+        
+        h2 {
+            color: #d92323;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #d92323;
+        }
+        
+        /* Episodes Section */
+        .episode-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 20px;
+        }
+        
+        .episode-card {
+            background-color: #f9f9f9;
+            border-radius: 5px;
+            overflow: hidden;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s;
+            position: relative;
+        }
+        
+        .episode-card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .episode-image {
+            height: 150px;
+            background-color: #ddd;
+            background-size: cover;
+            background-position: center;
+        }
+        
+        .episode-info {
+            padding: 15px;
+        }
+        
+        .episode-info h3 {
+            margin-bottom: 10px;
+            color: #333;
+        }
+        
+        .episode-info p {
+            color: #666;
+            font-size: 0.9rem;
+        }
+        
+        .episode-views {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background-color: rgba(0, 0, 0, 0.7);
+            color: white;
+            padding: 3px 8px;
+            border-radius: 10px;
+            font-size: 0.8rem;
+        }
+        
+        /* Comments Section */
+        .comments-section {
+            margin-top: 40px;
+        }
+        
+        .comment-form {
+            margin-bottom: 30px;
+        }
+        
+        .comment-form textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            resize: vertical;
+            min-height: 100px;
+            margin-bottom: 10px;
+        }
+        
+        .comment-form button {
+            background-color: #d92323;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        
+        .comment-form button:hover {
+            background-color: #b51c1c;
+        }
+        
+        .comment-list {
+            margin-top: 20px;
+        }
+        
+        .comment {
+            background-color: #f9f9f9;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 15px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+        
+        .comment-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            font-size: 0.9rem;
+            color: #666;
+        }
+        
+        .comment-user {
+            font-weight: bold;
+            color: #d92323;
+        }
+        
+        .sidebar {
+    flex: 1;
+    background: rgba(255, 255, 255, 0.1);
+    padding: 25px;
+    border-radius: 20px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    margin-left: 20px;
+    transition: all 0.5s ease;
+    transform-style: preserve-3d;
+    perspective: 1000px;
+}
+
+.sidebar:hover {
+    transform: translateY(-5px) rotateX(2deg);
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
+}
+
+.sidebar-section {
+    margin-bottom: 30px;
+    position: relative;
+    overflow: hidden;
+    padding-bottom: 20px;
+}
+
+.sidebar-section:not(:last-child)::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+}
+
+.sidebar h2 {
+    color: white;
+    margin-bottom: 20px;
+    padding-bottom: 10px;
+    position: relative;
+    text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.3);
+}
+
+.sidebar h2::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 50px;
+    height: 3px;
+    background: #d92323;
+    border-radius: 3px;
+    transition: width 0.5s ease;
+}
+
+.sidebar-section:hover h2::after {
+    width: 100px;
+}
+
+.sidebar ul {
+    list-style: none;
+}
+
+.sidebar ul li {
+    margin-bottom: 12px;
+    position: relative;
+    padding-left: 15px;
+    transform: translateX(0);
+    transition: all 0.3s ease;
+}
+
+.sidebar ul li::before {
+    content: '•';
+    position: absolute;
+    left: 0;
+    color: #d92323;
+    font-size: 1.2rem;
+    line-height: 1;
+}
+
+.sidebar ul li:hover {
+    transform: translateX(10px);
+}
+
+.sidebar ul li a {
+    color: rgba(255, 255, 255, 0.9);
+    text-decoration: none;
+    transition: all 0.3s ease;
+    display: block;
+    padding: 5px 0;
+}
+
+.sidebar ul li a:hover {
+    color: white;
+    text-shadow: 0 0 5px rgba(255, 255, 255, 0.5);
+}
+
+.ranking-list li {
+    display: flex;
+    justify-content: space-between;
+    padding: 10px 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    transition: all 0.3s ease;
+}
+
+.ranking-list li:hover {
+    background: rgba(255, 255, 255, 0.1);
+    transform: translateX(5px);
+    border-radius: 5px;
+    padding: 10px;
+}
+
+.ranking-number {
+    font-weight: bold;
+    color: #d92323;
+    text-shadow: 0 0 5px rgba(217, 35, 35, 0.5);
+}
+
+/* Floating Animation */
+@keyframes floatSidebar {
+    0%, 100% { transform: translateY(0) rotateX(0deg); }
+    50% { transform: translateY(-10px) rotateX(3deg); }
+}
+
+.sidebar {
+    animation: floatSidebar 8s ease-in-out infinite;
+}
+
+/* Responsive Adjustments */
+@media (max-width: 768px) {
+    .sidebar {
+        margin-left: 0;
+        margin-top: 20px;
+        backdrop-filter: blur(8px);
+    }
+    
+    .main-content {
+        flex-direction: column;
+    }
+}
+
+/* Ripple Effect */
+.ripple {
+    position: absolute;
+    border-radius: 50%;
+    transform: scale(0);
+    animation: ripple 0.6s linear;
+    pointer-events: none;
+}
+
+@keyframes ripple {
+    to {
+        transform: scale(4);
+        opacity: 0;
+    }
+}
+
+/* Sidebar Icons */
+.sidebar h2 i {
+    margin-right: 10px;
+    color: #d92323;
+}
+
+/* Glow Effect */
+.sidebar-section:hover {
+    box-shadow: 0 0 15px rgba(217, 35, 35, 0.3);
+}
+
+/* Transition for Z-axis movement */
+.sidebar-section {
+    transition: transform 0.5s ease, box-shadow 0.5s ease;
+    will-change: transform;
+}
+        
+        /* Footer */
+footer {
+    background-color: #333;
+    color: white;
+    text-align: center;
+    padding: 20px 0;
+    margin-top: 30px;
+}
+        
+/* Auth Buttons */
+.auth-buttons {
+    position: absolute;
+    right: 20px;
+    top: 20px;
+    display: flex;
+    gap: 10px;
+}
+
+.nav-auth-btn {
+    background: rgba(255, 255, 255, 0.2);
+    color: #007acc;
+    border: none;
+    padding: 8px 20px;
+    border-radius: 30px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    backdrop-filter: blur(5px);
+    box-shadow: 0 4px 6px rgba(0, 122, 204, 0.2);
+}
+
+.nav-auth-btn:hover {
+    background: rgba(255, 255, 255, 0.4);
+    transform: translateY(-2px);
+}
+
+.nav-auth-btn.signup {
+    background: #007acc;
+    color: white;
+}
+
+.nav-auth-btn.signup:hover {
+    background: #006bb3;
+    box-shadow: 0 6px 15px rgba(0, 122, 204, 0.4);
+}
+
+/* Modal Styles */
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 2000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.7);
+    backdrop-filter: blur(5px);
+}
+
+.modal-content {
+    background-color: rgba(173, 216, 230, 0.95);
+    margin: 10% auto;
+    padding: 30px;
+    border-radius: 20px;
+    width: 400px;
+    max-width: 90%;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+    position: relative;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    animation: modalFadeIn 0.4s ease-out;
+}
+
+@keyframes modalFadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.modal h2 {
+    color: #007acc;
+    margin-bottom: 20px;
+    text-align: center;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+.close {
+    position: absolute;
+    top: 15px;
+    right: 20px;
+    font-size: 24px;
+    font-weight: bold;
+    color: #007acc;
+    cursor: pointer;
+    transition: transform 0.3s;
+}
+
+.close:hover {
+    transform: rotate(90deg);
+    color: #006bb3;
+}
+
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 8px;
+    color: #007acc;
+    font-weight: 500;
+}
+
+.form-group input {
+    width: 100%;
+    padding: 12px 15px;
+    border: 1px solid rgba(0, 122, 204, 0.3);
+    border-radius: 30px;
+    background: rgba(255, 255, 255, 0.8);
+    font-size: 16px;
+    transition: all 0.3s;
+}
+
+.form-group input:focus {
+    outline: none;
+    border-color: #007acc;
+    box-shadow: 0 0 0 3px rgba(0, 122, 204, 0.2);
+    background: white;
+}
+
+.form-submit {
+    background-color: #007acc;
+    color: white;
+    border: none;
+    padding: 12px 25px;
+    border-radius: 30px;
+    cursor: pointer;
+    width: 100%;
+    font-size: 16px;
+    font-weight: 600;
+    transition: all 0.3s;
+    margin-top: 10px;
+    box-shadow: 0 4px 0 rgba(0, 91, 153, 0.5);
+}
+
+.form-submit:hover {
+    background-color: #006bb3;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 0 rgba(0, 91, 153, 0.5);
+}
+
+.form-submit:active {
+    transform: translateY(1px);
+    box-shadow: 0 2px 0 rgba(0, 91, 153, 0.5);
+}
+
+.form-switch {
+    text-align: center;
+    margin-top: 20px;
+    color: #007acc;
+}
+
+.form-switch a {
+    color: #005a99;
+    font-weight: 600;
+    text-decoration: none;
+    transition: all 0.3s;
+}
+
+.form-switch a:hover {
+    color: #004880;
+    text-decoration: underline;
+}
+        
+        /* Add these styles to your existing CSS */
+    .character-hero {
+        height: 400px;
+        background-size: cover;
+        background-position: center;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        text-align: center;
+        margin-bottom: 40px;
+        position: relative;
+        overflow: hidden;
+        border-radius: 10px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+    }
+    
+    .hero-content {
+        transform: translateY(20px);
+        opacity: 0;
+        animation: fadeInUp 1s ease-out 0.5s forwards;
+    }
+    
+    .hero-title {
+        font-size: 4rem;
+        color: #d92323;
+        text-shadow: 3px 3px 0 #000, 5px 5px 10px rgba(0,0,0,0.5);
+        margin-bottom: 20px;
+        letter-spacing: 2px;
+    }
+    
+    .hero-subtitle {
+        font-size: 1.5rem;
+        color: white;
+        max-width: 800px;
+        margin: 0 auto;
+        text-shadow: 1px 1px 3px rgba(0,0,0,0.8);
+    }
+    
+    .scroll-down {
+        position: absolute;
+        bottom: 30px;
+        color: white;
+        font-size: 2rem;
+        animation: bounce 2s infinite;
+    }
+    
+    .section-title {
+        position: relative;
+        padding-bottom: 15px;
+        margin-bottom: 30px;
+        color: #d92323;
+        font-size: 2.5rem;
+    }
+    
+    .section-title::after {
+        content: '';
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        width: 100px;
+        height: 4px;
+        background: linear-gradient(90deg, #d92323, transparent);
+        border-radius: 2px;
+    }
+    
+    .character-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+        gap: 30px;
+    }
+    
+    .character-card {
+        background: white;
+        border-radius: 10px;
+        overflow: hidden;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        transition: all 0.3s ease;
+        transform: translateY(50px);
+        opacity: 0;
+    }
+    
+    .character-card.animate {
+        animation: fadeInUp 0.8s ease-out forwards;
+    }
+    
+    .character-image {
+        height: 350px;
+        background-size: cover;
+        background-position: center;
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .character-image::after {
+        content: '';
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(to top, rgba(0,0,0,0.8), transparent);
+    }
+    
+    .character-info {
+        padding: 20px;
+        background: white;
+        position: relative;
+        z-index: 1;
+    }
+    
+    .character-info h3 {
+        color: #333;
+        font-size: 1.5rem;
+        margin-bottom: 10px;
+    }
+    
+    .character-info p {
+        color: #666;
+        line-height: 1.6;
+    }
+    
+    .floating-card {
+        transition: all 0.5s ease;
+        transform: translateY(0);
+    }
+    
+    .floating-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 25px rgba(217, 35, 35, 0.2);
+    }
+    
+    .devil-fruit-gallery {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 10px;
+    }
+    
+    .fruit-card {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        padding: 10px;
+        border-radius: 8px;
+        background: rgba(255,255,255,0.1);
+        transition: all 0.3s ease;
+        cursor: pointer;
+    }
+    
+    .fruit-card:hover {
+        background: rgba(217, 35, 35, 0.2);
+        transform: scale(1.05);
+    }
+    
+    .fruit-card img {
+        width: 50px;
+        height: 50px;
+        object-fit: contain;
+        margin-bottom: 5px;
+    }
+    
+    .fruit-card span {
+        font-size: 0.7rem;
+        text-align: center;
+        color: white;
+    }
+    
+    .trivia-card {
+        background: rgba(255,255,255,0.1);
+        padding: 15px;
+        border-radius: 8px;
+        border-left: 3px solid #d92323;
+    }
+    
+    .trivia-card p {
+        color: white;
+        font-style: italic;
+        line-height: 1.6;
+    }
+    
+    .category-link {
+        display: block;
+        padding: 10px;
+        border-radius: 5px;
+        transition: all 0.3s ease;
+        color: white;
+        text-decoration: none;
+    }
+    
+    .category-link:hover {
+        background: rgba(217, 35, 35, 0.3);
+        padding-left: 15px;
+    }
+    
+    /* Animations */
+    @keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+    
+    @keyframes bounce {
+        0%, 20%, 50%, 80%, 100% {
+            transform: translateY(0);
+        }
+        40% {
+            transform: translateY(-20px);
+        }
+        60% {
+            transform: translateY(-10px);
+        }
+    }
+    
+    /* Responsive */
+    @media (max-width: 768px) {
+        .hero-title {
+            font-size: 2.5rem;
+        }
+        
+        .hero-subtitle {
+            font-size: 1.2rem;
+        }
+        
+        .character-grid {
+            grid-template-columns: 1fr;
+        }
+        
+        .devil-fruit-gallery {
+            grid-template-columns: repeat(3, 1fr);
+        }
+    }
+        
+        /* ===== News Page Styles ===== */
+    .news-hero {
+        height: 400px;
+        background-size: cover;
+        background-position: center;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        border-radius: 10px;
+        margin-bottom: 40px;
+        position: relative;
+        overflow: hidden;
+        box-shadow: 0 15px 35px rgba(0,0,0,0.3);
+        transform-style: preserve-3d;
+        perspective: 1000px;
+    }
+    
+    .news-hero::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: url('https://i.imgur.com/JqYeZvn.jpg') center/cover;
+        filter: blur(5px);
+        z-index: -1;
+        transform: translateZ(-20px);
+    }
+    
+    .hero-title {
+        font-size: 4.5rem;
+        color: white;
+        text-shadow: 3px 3px 0 #000, 5px 5px 15px rgba(0,0,0,0.8);
+        margin-bottom: 15px;
+        letter-spacing: 3px;
+    }
+    
+    .hero-title .highlight {
+        color: #d92323;
+        font-weight: bold;
+    }
+    
+    .hero-subtitle {
+        font-size: 1.5rem;
+        color: white;
+        margin-bottom: 30px;
+        text-shadow: 1px 1px 3px rgba(0,0,0,0.8);
+    }
+    
+    .news-ticker {
+        background: rgba(217, 35, 35, 0.8);
+        color: white;
+        padding: 10px;
+        border-radius: 5px;
+        max-width: 800px;
+        margin: 0 auto;
+        display: flex;
+        align-items: center;
+    }
+    
+    .breaking-news {
+        background: black;
+        padding: 5px 10px;
+        border-radius: 3px;
+        margin-right: 15px;
+        font-weight: bold;
+        animation: blink 1.5s infinite;
+    }
+    
+    .news-ticker marquee {
+        flex: 1;
+    }
+    
+    .featured-news {
+        margin-bottom: 50px;
+    }
+    
+    .featured-card {
+        display: flex;
+        background: white;
+        border-radius: 10px;
+        overflow: hidden;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        transform-style: preserve-3d;
+        transition: all 0.5s ease;
+    }
+    
+    .featured-card:hover {
+        transform: translateY(-5px) rotateX(5deg);
+        box-shadow: 0 15px 40px rgba(217, 35, 35, 0.2);
+    }
+    
+    .featured-image {
+        flex: 1;
+        min-height: 300px;
+        background-size: cover;
+        background-position: center;
+        position: relative;
+    }
+    
+    .featured-content {
+        flex: 1;
+        padding: 30px;
+        display: flex;
+        flex-direction: column;
+    }
+    
+    .news-category {
+        display: inline-block;
+        padding: 5px 15px;
+        border-radius: 20px;
+        font-size: 0.8rem;
+        font-weight: bold;
+        margin-bottom: 15px;
+        align-self: flex-start;
+    }
+    
+    .news-category.anime {
+        background: #d92323;
+        color: white;
+    }
+    
+    .featured-content h3 {
+        font-size: 1.8rem;
+        margin-bottom: 15px;
+        color: #333;
+    }
+    
+    .news-excerpt {
+        color: #666;
+        line-height: 1.6;
+        margin-bottom: 20px;
+    }
+    
+    .news-meta {
+        display: flex;
+        gap: 20px;
+        color: #888;
+        margin-bottom: 20px;
+        font-size: 0.9rem;
+    }
+    
+    .read-more-btn {
+        align-self: flex-start;
+        background: #d92323;
+        color: white;
+        border: none;
+        padding: 12px 25px;
+        border-radius: 30px;
+        font-weight: bold;
+        cursor: pointer;
+        transition: all 0.3s;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+    
+    .read-more-btn:hover {
+        background: #b51c1c;
+        transform: translateY(-3px);
+        box-shadow: 0 5px 15px rgba(217, 35, 35, 0.3);
+    }
+    
+    .news-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+        gap: 30px;
+    }
+    
+    .news-item {
+        background: white;
+        border-radius: 10px;
+        overflow: hidden;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+        transition: all 0.5s ease;
+        transform-style: preserve-3d;
+    }
+    
+    .news-item:hover {
+        transform: translateY(-5px) rotateY(5deg);
+        box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+    }
+    
+    .news-item-image {
+        height: 200px;
+        background-size: cover;
+        background-position: center;
+        position: relative;
+    }
+    
+    .news-item-content {
+        padding: 20px;
+    }
+    
+    .news-item h3 {
+        font-size: 1.2rem;
+        margin-bottom: 10px;
+        color: #333;
+    }
+    
+    .news-item p {
+        color: #666;
+        font-size: 0.9rem;
+        line-height: 1.6;
+        margin-bottom: 15px;
+    }
+    
+    /* ===== Forum Page Styles ===== */
+    .forum-hero {
+        height: 400px;
+        background-size: cover;
+        background-position: center;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        border-radius: 10px;
+        margin-bottom: 40px;
+        position: relative;
+        overflow: hidden;
+        box-shadow: 0 15px 35px rgba(0,0,0,0.3);
+    }
+    
+    .forum-hero::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(45deg, rgba(30,60,114,0.7), rgba(217,35,35,0.7));
+    }
+    
+    .forum-stats {
+        display: flex;
+        justify-content: center;
+        gap: 40px;
+        margin-top: 30px;
+    }
+    
+    .stat-item {
+        text-align: center;
+    }
+    
+    .stat-number {
+        font-size: 2.5rem;
+        font-weight: bold;
+        color: white;
+        text-shadow: 2px 2px 5px rgba(0,0,0,0.5);
+    }
+    
+    .stat-label {
+        font-size: 1rem;
+        color: rgba(255,255,255,0.9);
+        text-transform: uppercase;
+        letter-spacing: 1px;
+    }
+    
+    .forum-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 30px;
+    }
+    
+    .new-topic-btn {
+        background: #d92323;
+        color: white;
+        border: none;
+        padding: 12px 25px;
+        border-radius: 30px;
+        font-weight: bold;
+        cursor: pointer;
+        transition: all 0.3s;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        box-shadow: 0 4px 0 rgba(153, 27, 27, 0.5);
+    }
+    
+    .new-topic-btn:hover {
+        background: #b51c1c;
+        transform: translateY(-3px);
+        box-shadow: 0 6px 0 rgba(153, 27, 27, 0.5);
+    }
+    
+    .new-topic-btn:active {
+        transform: translateY(1px);
+        box-shadow: 0 2px 0 rgba(153, 27, 27, 0.5);
+    }
+    
+    .forum-topics {
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+    }
+    
+    .topic-card {
+        background: white;
+        border-radius: 10px;
+        padding: 20px;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+        transition: all 0.3s ease;
+        display: flex;
+        align-items: center;
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .topic-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 5px;
+        height: 100%;
+        background: #d92323;
+        transition: all 0.3s ease;
+    }
+    
+    .topic-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+    }
+    
+    .topic-card:hover::before {
+        width: 8px;
+    }
+    
+    .topic-avatar {
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        background-size: cover;
+        background-position: center;
+        margin-right: 20px;
+        flex-shrink: 0;
+        border: 3px solid #d92323;
+    }
+    
+    .topic-content {
+        flex: 1;
+    }
+    
+    .topic-title {
+        font-size: 1.2rem;
+        margin-bottom: 5px;
+        color: #333;
+    }
+    
+    .topic-meta {
+        display: flex;
+        gap: 15px;
+        color: #888;
+        font-size: 0.9rem;
+        margin-bottom: 10px;
+    }
+    
+    .topic-stats {
+        display: flex;
+        gap: 15px;
+    }
+    
+    .topic-stat {
+        display: flex;
+        align-items: center;
+        gap: 5px;
+        color: #666;
+        font-size: 0.9rem;
+    }
+    
+    .pagination {
+        display: flex;
+        justify-content: center;
+        gap: 10px;
+        margin-top: 40px;
+    }
+    
+    .page-btn {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        border: none;
+        background: #eee;
+        color: #666;
+        cursor: pointer;
+        transition: all 0.3s;
+    }
+    
+    .page-btn.active {
+        background: #d92323;
+        color: white;
+    }
+    
+    .page-btn:hover:not(.active) {
+        background: #ddd;
+    }
+    
+    /* ===== Sidebar Styles ===== */
+    .card-3d {
+        background: white;
+        border-radius: 10px;
+        padding: 25px;
+        margin-bottom: 25px;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+        transition: all 0.5s ease;
+        transform-style: preserve-3d;
+    }
+    
+    .card-3d:hover {
+        transform: translateY(-5px) rotateY(5deg);
+        box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+    }
+    
+    .category-list li {
+        margin-bottom: 10px;
+    }
+    
+    .category-list a {
+        display: flex;
+        align-items: center;
+        padding: 10px;
+        border-radius: 5px;
+        color: #333;
+        text-decoration: none;
+        transition: all 0.3s;
+    }
+    
+    .category-list a:hover {
+        background: rgba(217, 35, 35, 0.1);
+        transform: translateX(5px);
+    }
+    
+    .category-list i {
+        margin-right: 10px;
+        font-size: 1.2rem;
+    }
+    
+    .category-count {
+        margin-left: auto;
+        background: #eee;
+        padding: 3px 8px;
+        border-radius: 10px;
+        font-size: 0.8rem;
+    }
+    
+    .anime-icon { color: #d92323; }
+    .manga-icon { color: #1e3c72; }
+    .games-icon { color: #8E2DE2; }
+    .merch-icon { color: #f46b45; }
+    .events-icon { color: #11998e; }
+    
+    .newsletter-card {
+        text-align: center;
+        background: linear-gradient(135deg, #3cb6ee, #1e3c72);
+        color: white;
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .newsletter-card::before {
+        content: '';
+        position: absolute;
+        top: -50px;
+        right: -50px;
+        width: 100px;
+        height: 100px;
+        background: rgba(255,255,255,0.1);
+        border-radius: 50%;
+    }
+    
+    .newsletter-icon {
+        font-size: 2.5rem;
+        margin-bottom: 15px;
+        color: white;
+    }
+    
+    .newsletter-card h2 {
+        color: white;
+    }
+    
+    .newsletter-form {
+        margin-top: 20px;
+    }
+    
+    .newsletter-form input {
+        width: 100%;
+        padding: 12px 15px;
+        border: none;
+        border-radius: 30px;
+        margin-bottom: 10px;
+    }
+    
+    .subscribe-btn {
+        background: white;
+        color: #d92323;
+        border: none;
+        padding: 12px 25px;
+        border-radius: 30px;
+        font-weight: bold;
+        cursor: pointer;
+        transition: all 0.3s;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        width: 100%;
+    }
+    
+    .subscribe-btn:hover {
+        background: #f0f0f0;
+        transform: translateY(-3px);
+    }
+    
+    .trending-card h2 {
+        margin-bottom: 20px;
+    }
+    
+    .trending-item {
+        display: flex;
+        align-items: center;
+        padding: 10px 0;
+        border-bottom: 1px solid #eee;
+    }
+    
+    .trending-number {
+        width: 30px;
+        height: 30px;
+        background: #d92323;
+        color: white;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: bold;
+        margin-right: 15px;
+    }
+    
+    .trending-content h4 {
+        font-size: 1rem;
+        margin-bottom: 3px;
+    }
+    
+    .trending-content p {
+        font-size: 0.8rem;
+        color: #888;
+    }
+    
+    .forum-categories li {
+        margin-bottom: 15px;
+    }
+    
+    .forum-categories a {
+        display: flex;
+        align-items: center;
+        padding: 10px;
+        border-radius: 5px;
+        color: #333;
+        text-decoration: none;
+        transition: all 0.3s;
+    }
+    
+    .forum-categories a:hover {
+        background: rgba(217, 35, 35, 0.1);
+        transform: translateX(5px);
+    }
+    
+    .category-icon {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-right: 15px;
+        color: white;
+        font-size: 1.2rem;
+    }
+    
+    .anime-cat { background: #d92323; }
+    .manga-cat { background: #1e3c72; }
+    .theory-cat { background: #8E2DE2; }
+    .fanart-cat { background: #f46b45; }
+    .general-cat { background: #11998e; }
+    
+    .category-info h4 {
+        font-size: 1rem;
+        margin-bottom: 3px;
+    }
+    
+    .category-info p {
+        font-size: 0.8rem;
+        color: #888;
+    }
+    
+    .tag-cloud {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+    }
+    
+    .tag {
+        display: inline-block;
+        padding: 5px 15px;
+        border-radius: 20px;
+        font-size: 0.8rem;
+        background: rgba(var(--tag-color-rgb), 0.1);
+        color: var(--tag-color);
+        text-decoration: none;
+        transition: all 0.3s;
+        border: 1px solid var(--tag-color);
+    }
+    
+    .tag:hover {
+        background: var(--tag-color);
+        color: white;
+        transform: translateY(-3px);
+    }
+    
+    .tag-sm {
+        padding: 3px 10px;
+        font-size: 0.7rem;
+    }
+    
+    .tag-lg {
+        padding: 7px 20px;
+        font-size: 0.9rem;
+    }
+    
+    .active-users h2 {
+        margin-bottom: 20px;
+    }
+    
+    .user-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 10px;
+    }
+    
+    .user-avatar {
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        background-size: cover;
+        background-position: center;
+        position: relative;
+        cursor: pointer;
+        transition: all 0.3s;
+    }
+    
+    .user-avatar:hover {
+        transform: scale(1.1);
+        box-shadow: 0 0 0 3px #d92323;
+    }
+    
+    .user-avatar img {
+        width: 100%;
+        height: 100%;
+        border-radius: 50%;
+        object-fit: cover;
+    }
+    
+    .more-users {
+        width: 100%;
+        height: 100%;
+        background: rgba(30, 60, 114, 0.7);
+        color: white;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50%;
+        font-size: 0.8rem;
+    }
+    
+    /* ===== Animations ===== */
+    @keyframes blink {
+        0%, 100% { opacity: 1; }
+        50% { opacity: 0.5; }
+    }
+    
+    @keyframes float {
+        0%, 100% { transform: translateY(0); }
+        50% { transform: translateY(-10px); }
+    }
+    
+    .section-title.with-icon {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+    
+    .section-title.with-icon i {
+        color: #d92323;
+    }
+    
+    /* ===== Responsive ===== */
+    @media (max-width: 992px) {
+        .featured-card {
+            flex-direction: column;
+        }
+        
+        .featured-image {
+            min-height: 200px;
+        }
+        
+        .news-grid {
+            grid-template-columns: 1fr;
+        }
+        
+        .forum-stats {
+            flex-direction: column;
+            gap: 15px;
+        }
+    }
+    
+    @media (max-width: 768px) {
+        .hero-title {
+            font-size: 3rem;
+        }
+        
+        .hero-subtitle {
+            font-size: 1.2rem;
+        }
+        
+        .news-ticker {
+            flex-direction: column;
+            text-align: center;
+        }
+        
+        .breaking-news {
+            margin-right: 0;
+            margin-bottom: 10px;
+        }
+    }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .main-content {
+                flex-direction: column;
+            }
+            
+            .content-section {
+                margin-right: 0;
+                margin-bottom: 20px;
+            }
+            
+            .episode-list, .character-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .auth-buttons {
+                position: static;
+                text-align: center;
+                margin-top: 10px;
+            }
+        }
+ /* === Main Content Styles === */
+.content-section {
+    background: rgba(255, 255, 255, 0.9);
+    border-radius: 15px;
+    padding: 30px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    backdrop-filter: blur(5px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.section-title {
+    color: rgb(98, 204, 246);
+    font-size: 2.2rem;
+    margin-bottom: 15px;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+    position: relative;
+    padding-bottom: 10px;
+}
+
+.section-title::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 80px;
+    height: 3px;
+    background: rgb(98, 204, 246);
+}
+
+.welcome-text {
+    color: #444;
+    font-size: 1.1rem;
+    line-height: 1.7;
+    margin-bottom: 30px;
+}
+
+/* === Featured Episode === */
+.featured-episode-section {
+    margin: 40px 0;
+}
+
+.subsection-title {
+    color: rgb(98, 204, 246);
+    font-size: 1.5rem;
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.subsection-title i {
+    color: rgb(98, 204, 246);
+}
+
+.episode-card {
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+}
+
+.episode-header {
+    height: 250px;
+    background-size: cover;
+    background-position: center;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    padding: 20px;
+    position: relative;
+}
+
+.trending-badge {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    background: #d92323;
+    color: white;
+    padding: 5px 15px;
+    border-radius: 20px;
+    font-weight: bold;
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+}
+
+.episode-title {
+    color: white;
+    font-size: 1.8rem;
+    font-weight: bold;
+    text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.5);
+}
+
+.episode-details {
+    padding: 25px;
+    background: white;
+}
+
+.meta-info {
+    display: flex;
+    gap: 20px;
+    margin-bottom: 15px;
+    color: #666;
+    font-size: 0.9rem;
+}
+
+.meta-info i {
+    margin-right: 5px;
+    color: rgb(98, 204, 246);
+}
+
+.view-count {
+    color: rgb(98, 204, 246);
+    font-weight: bold;
+}
+
+.episode-description {
+    color: #444;
+    line-height: 1.7;
+    margin: 20px 0;
+}
+
+.episode-tags {
+    display: flex;
+    gap: 10px;
+    margin: 20px 0;
+}
+
+.tag {
+    padding: 5px 15px;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: bold;
+}
+
+.gear-tag { background: #f8e58c; color: #b35900; }
+.battle-tag { background: #ffcccc; color: rgb(98, 204, 246) }
+.lore-tag { background: #cce5ff; color: #0066cc; }
+
+.action-buttons {
+    display: flex;
+    gap: 15px;
+    margin-top: 25px;
+}
+
+.pirate-button {
+    background: rgb(98, 204, 246);
+    color: white;
+    border: none;
+    padding: 12px 25px;
+    border-radius: 30px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.navy-button {
+    background: #1e3c72;
+    color: white;
+    border: none;
+    padding: 12px 25px;
+    border-radius: 30px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.pirate-button:hover {
+    background: rgb(98, 204, 246);
+    transform: translateY(-3px);
+    box-shadow: 0 5px 15px rgba(217, 35, 35, 0.3);
+}
+
+.navy-button:hover {
+    background: #142a50;
+    transform: translateY(-3px);
+    box-shadow: 0 5px 15px rgba(30, 60, 114, 0.3);
+}
+
+/* === Community Highlights === */
+.community-section {
+    margin: 50px 0 30px;
+}
+
+.highlights-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 25px;
+    margin-top: 20px;
+}
+
+.highlight-card {
+    background: white;
+    border-radius: 10px;
+    padding: 25px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+    transition: all 0.3s;
+    border: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.highlight-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+}
+
+.card-icon {
+    font-size: 1.8rem;
+    color: rgb(98, 204, 246);
+    margin-bottom: 15px;
+}
+
+.highlight-card h4 {
+    color: #333;
+    margin-bottom: 15px;
+    font-size: 1.2rem;
+}
+
+/* Poll Card */
+.poll-results {
+    margin: 20px 0;
+}
+
+.poll-option {
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.option-name {
+    width: 60px;
+    font-weight: bold;
+    color: #333;
+}
+
+.option-bar {
+    height: 10px;
+    background: rgb(98, 204, 246);
+    border-radius: 5px;
+    margin: 0 10px;
+    transition: width 1s ease;
+}
+
+.option-percent {
+    width: 40px;
+    text-align: right;
+    color: #666;
+}
+
+/* Theory Card */
+.theory-title {
+    font-weight: bold;
+    color: #333;
+    margin: 10px 0 5px;
+}
+
+.theory-teaser {
+    color: #666;
+    font-size: 0.9rem;
+    line-height: 1.5;
+    margin-bottom: 15px;
+}
+
+/* Fan Art Card */
+.fanart-preview {
+    height: 150px;
+    background-size: cover;
+    background-position: center;
+    border-radius: 5px;
+    margin: 15px 0;
+}
+
+.artist-name {
+    color: #666;
+    font-size: 0.9rem;
+    text-align: center;
+    margin-bottom: 15px;
+}
+
+/* Common Links */
+.read-more, .view-gallery {
+    color: rgb(98, 204, 246);
+    font-weight: bold;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    transition: all 0.3s;
+}
+
+.read-more:hover, .view-gallery:hover {
+    color:  rgb(98, 204, 246);
+    gap: 8px;
+}
+
+/* === Responsive Design === */
+@media (max-width: 768px) {
+    .section-title {
+        font-size: 1.8rem;
+    }
+    
+    .episode-header {
+        height: 200px;
+    }
+    
+    .episode-title {
+        font-size: 1.4rem;
+    }
+    
+    .meta-info {
+        flex-direction: column;
+        gap: 8px;
+    }
+    
+    .action-buttons {
+        flex-direction: column;
+    }
+    
+    .highlights-grid {
+        grid-template-columns: 1fr;
+    }
+}
+/* === Episodes Page Styles === */
+.episode-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 25px;
+    margin: 30px 0;
+}
+
+.episode-card {
+    background: white;
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+    transition: all 0.3s ease;
+    transform-style: preserve-3d;
+}
+
+.episode-card:hover {
+    transform: translateY(-5px) rotateX(2deg);
+    box-shadow: 0 10px 25px rgba(217, 35, 35, 0.1);
+}
+
+.episode-thumbnail {
+    height: 170px;
+    background-size: cover;
+    background-position: center;
+    position: relative;
+}
+
+.episode-badge {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: rgb(98, 204, 246);
+    color: white;
+    padding: 3px 10px;
+    border-radius: 20px;
+    font-size: 0.7rem;
+    font-weight: bold;
+    text-transform: uppercase;
+}
+
+.play-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.3);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transition: all 0.3s;
+}
+
+.play-overlay i {
+    color: white;
+    font-size: 2.5rem;
+    text-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+}
+
+.episode-card:hover .play-overlay {
+    opacity: 1;
+}
+
+.episode-info {
+    padding: 15px;
+}
+
+.episode-info h3 {
+    color: #333;
+    font-size: 1.1rem;
+    margin-bottom: 10px;
+    line-height: 1.3;
+}
+
+.episode-meta {
+    display: flex;
+    gap: 15px;
+    font-size: 0.8rem;
+    color: #666;
+    margin-bottom: 10px;
+}
+
+.episode-meta i {
+    color: #d92323;
+    margin-right: 3px;
+}
+
+.episode-desc {
+    color: #555;
+    font-size: 0.9rem;
+    line-height: 1.5;
+    margin-bottom: 15px;
+}
+
+.episode-actions {
+    display: flex;
+    gap: 10px;
+}
+
+.pirate-btn-sm, .navy-btn-sm {
+    padding: 8px 15px;
+    font-size: 0.8rem;
+    border-radius: 20px;
+    border: none;
+    cursor: pointer;
+    transition: all 0.3s;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.pirate-btn-sm {
+    background: #d92323;
+    color: white;
+}
+
+.navy-btn-sm {
+    background: #1e3c72;
+    color: white;
+}
+
+.pirate-btn-sm:hover {
+    background: #b51c1c;
+    transform: translateY(-2px);
+}
+
+.navy-btn-sm:hover {
+    background: #142a50;
+    transform: translateY(-2px);
+}
+
+/* === Comments Section === */
+.comments-section {
+    margin-top: 50px;
+    background: white;
+    padding: 25px;
+    border-radius: 10px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+}
+
+.subsection-title {
+    color: rgb(98, 204, 246);
+    font-size: 1.5rem;
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.comment-form {
+    background: #f9f9f9;
+    padding: 20px;
+    border-radius: 10px;
+    margin-bottom: 30px;
+}
+
+.form-header {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    margin-bottom: 15px;
+}
+
+.user-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid rgb(98, 204, 246);
+}
+
+.comment-form h3 {
+    color: #333;
+    font-size: 1.1rem;
+}
+
+.comment-form textarea {
+    width: 100%;
+    padding: 15px;
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    min-height: 100px;
+    resize: vertical;
+    font-family: inherit;
+    transition: all 0.3s;
+}
+
+.comment-form textarea:focus {
+    outline: none;
+    border-color: rgb(98, 204, 246);
+    box-shadow: 0 0 0 3px rgba(217, 35, 35, 0.1);
+}
+
+.form-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 15px;
+}
+
+.char-counter {
+    font-size: 0.8rem;
+    color: #666;
+}
+
+/* Comment List */
+.comment-list {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.comment-card {
+    background: white;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.05);
+    border-left: 3px solid rgb(98, 204, 246);
+}
+
+.comment-header {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    margin-bottom: 15px;
+    position: relative;
+}
+
+.comment-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+.comment-user {
+    flex: 1;
+}
+
+.username {
+    font-weight: bold;
+    color: #333;
+    display: block;
+}
+
+.comment-date {
+    font-size: 0.8rem;
+    color: #666;
+}
+
+.comment-badge {
+    background: #f8e58c;
+    color: #b35900;
+    padding: 3px 10px;
+    border-radius: 20px;
+    font-size: 0.7rem;
+    font-weight: bold;
+}
+
+.comment-body {
+    color: #444;
+    line-height: 1.6;
+    margin-bottom: 15px;
+}
+
+.comment-actions {
+    display: flex;
+    gap: 15px;
+}
+
+.like-btn, .reply-btn {
+    background: none;
+    border: none;
+    color: rgb(98, 204, 246);
+    font-size: 0.8rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    transition: all 0.3s;
+}
+
+.like-btn:hover, .reply-btn:hover {
+    color: #d92323;
+}
+
+/* === Sidebar Styles === */
+.ranking-container {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.ranked-episode {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    padding: 10px;
+    border-radius: 8px;
+    transition: all 0.3s;
+}
+
+.ranked-episode:hover {
+    background: rgba(217, 35, 35, 0.05);
+    transform: translateX(5px);
+}
+
+.rank-number {
+    width: 30px;
+    height: 30px;
+    background: rgb(98, 204, 246);
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    flex-shrink: 0;
+}
+
+.rank-content {
+    flex: 1;
+}
+
+.rank-title {
+    font-weight: bold;
+    color: #333;
+    font-size: 0.9rem;
+    margin-bottom: 3px;
+}
+
+.rank-stats {
+    display: flex;
+    gap: 10px;
+    font-size: 0.8rem;
+    color: #666;
+}
+
+.rank-stats i {
+    color: #ffc107;
+}
+
+.platform-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 15px;
+}
+
+.platform-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 15px;
+    border-radius: 8px;
+    transition: all 0.3s;
+    text-decoration: none;
+    color: red;
+    background: #f5f5f5;
+}
+
+.platform-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+}
+
+.platform-card img {
+    width: 40px;
+    height: 40px;
+    object-fit: contain;
+    margin-bottom: 10px;
+}
+
+.platform-card span {
+    font-size: 0.8rem;
+    font-weight: bold;
+    text-align: center;
+}
+
+.upcoming-episode {
+    background: rgba(173, 216, 230, 0.3);
+    padding: 15px;
+    border-radius: 10px;
+    border-left: 3px solid #d92323;
+}
+
+.upcoming-date {
+    color: #d92323;
+    font-weight: bold;
+    margin-bottom: 5px;
+}
+
+.upcoming-title {
+    font-weight: bold;
+    color: #333;
+    margin-bottom: 5px;
+}
+
+.upcoming-desc {
+    font-size: 0.8rem;
+    color: red;
+    line-height: 1.4;
+}
+
+/* === Animations === */
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.episode-card, .comment-card, .ranked-episode {
+    animation: fadeIn 0.5s ease-out forwards;
+}
+
+/* === Responsive Design === */
+@media (max-width: 992px) {
+    .main-content {
+        flex-direction: column;
+    }
+    
+    .sidebar {
+        margin-top: 30px;
+    }
+    
+    .episode-grid {
+        grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    }
+}
+
+@media (max-width: 576px) {
+    .episode-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .platform-grid {
+        grid-template-columns: 1fr;
+    }
+}
+    </style>
+</head>
+<body>
+<!-- Login Modal -->
+<div id="loginModal" class="modal">
+    <div class="modal-content">
+        <span class="close" id="closeLogin">&times;</span>
+        <h2>Welcome Back!</h2>
+        <form id="loginForm">
+            <div class="form-group">
+                <label for="loginUsername">Username</label>
+                <input type="text" id="loginUsername" required placeholder="Enter your username">
+            </div>
+            <div class="form-group">
+                <label for="loginPassword">Password</label>
+                <input type="password" id="loginPassword" required placeholder="Enter your password">
+            </div>
+            <button type="submit" class="form-submit">LOG IN</button>
+            <div class="form-switch">
+                Don't have an account? <a id="switchToSignup">Sign up now</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Signup Modal -->
+<div id="signupModal" class="modal">
+    <div class="modal-content">
+        <span class="close" id="closeSignup">&times;</span>
+        <h2>Join the Crew!</h2>
+        <form id="signupForm">
+            <div class="form-group">
+                <label for="signupUsername">Username</label>
+                <input type="text" id="signupUsername" required placeholder="Choose a username">
+            </div>
+            <div class="form-group">
+                <label for="signupEmail">Email</label>
+                <input type="email" id="signupEmail" required placeholder="Enter your email">
+            </div>
+            <div class="form-group">
+                <label for="signupPassword">Password</label>
+                <input type="password" id="signupPassword" required placeholder="Create a password">
+            </div>
+            <div class="form-group">
+                <label for="signupConfirm">Confirm Password</label>
+                <input type="password" id="signupConfirm" required placeholder="Confirm your password">
+            </div>
+            <button type="submit" class="form-submit">SIGN UP</button>
+            <div class="form-switch">
+                Already have an account? <a id="switchToLogin">Log in</a>
+            </div>
+        </form>
+    </div>
+</div>
+    <nav class="navbar">
+        <div class="logo">OnePiece</div>
+        <div class="hamburger" id="hamburger">
+            <span></span>
+            <span></span>
+            <span></span>
+        </div>
+        <ul class="nav-links" id="nav-links">
+            <li><a href="#" class="nav-link" data-page="home">Home</a></li>
+            <li><a href="#" class="nav-link" data-page="characters">Characters</a></li>
+            <li><a href="#" class="nav-link" data-page="episodes">Episodes</a></li>
+            <li><a href="#" class="nav-link" data-page="news">News</a></li>
+            <li><a href="#" class="nav-link" data-page="forum">Forum</a></li>
+        </ul>
+    </nav>>
+
+    <header>
+        <div class="container">
+            <div class="auth-buttons">
+                <button id="loginBtn" class="nav-auth-btn">LOG IN</button>
+                <button id="signupBtn" class="nav-auth-btn signup">SIGN UP</button>
+            </div>
+            <h1>One Piece Fan Base</h1>
+            <p>Join the Straw Hat crew's adventure!</p>
+        </div>
+    </header>
+    
+    
+
+    <div class="container">
+        <h1 style="text-align: center; margin: 30px 0; color: #d92323;">One Piece Crazy Slider</h1>
+        
+        <div class="crazy-slider">
+            <!-- Slide 1 -->
+            <div class="slide active" style="background: linear-gradient(45deg, #d92323, #333);">
+                <div class="slide-content">
+                    <h2 class="slide-title">Gear Fifth Revealed!</h2>
+                    <p class="slide-desc">Witness Luffy's ultimate transformation as he awakens the power of the Sun God Nika in the battle against Kaido.</p>
+                    <a href="#" class="slide-btn">Watch Now</a>
+                </div>
+            </div>
+            
+            <!-- Slide 2 -->
+            <div class="slide next" style="background: linear-gradient(45deg, #1e3c72, #2a5298);">
+                <div class="slide-content">
+                    <h2 class="slide-title">Wano Country Arc</h2>
+                    <p class="slide-desc">The epic conclusion to the battle in Wano as the Straw Hats face off against Kaido and Big Mom.</p>
+                    <a href="#" class="slide-btn">Explore Arc</a>
+                </div>
+            </div>
+            
+            <!-- Slide 3 -->
+            <div class="slide far-next" style="background: linear-gradient(45deg, #8E2DE2, #4A00E0);">
+                <div class="slide-content">
+                    <h2 class="slide-title">Straw Hat Crew</h2>
+                    <p class="slide-desc">Meet the legendary pirates sailing under Luffy's flag on their journey to find the One Piece.</p>
+                    <a href="#" class="slide-btn">Meet the Crew</a>
+                </div>
+            </div>
+            
+            <!-- Slide 4 -->
+            <div class="slide far-prev" style="background: linear-gradient(45deg, #11998e, #38ef7d);">
+                <div class="slide-content">
+                    <h2 class="slide-title">Devil Fruits</h2>
+                    <p class="slide-desc">Discover the mysterious powers that grant incredible abilities but take away the user's ability to swim.</p>
+                    <a href="#" class="slide-btn">Learn More</a>
+                </div>
+            </div>
+            
+            <!-- Slide 5 -->
+            <div class="slide prev" style="background: linear-gradient(45deg, #f46b45, #cd0505);">
+                <div class="slide-content">
+                    <h2 class="slide-title">Marineford War</h2>
+                    <p class="slide-desc">Relive the epic battle that changed the world's balance of power and shook the Grand Line.</p>
+                    <a href="#" class="slide-btn">Rewatch</a>
+                </div>
+            </div>
+            
+            <!-- Navigation Arrows -->
+            <div class="slider-nav">
+                <div class="nav-arrow prev-arrow">
+                    <i class="fas fa-chevron-left"></i>
+                </div>
+                <div class="nav-arrow next-arrow">
+                    <i class="fas fa-chevron-right"></i>
+                </div>
+            </div>
+            
+            <!-- Pagination Dots -->
+            <div class="slider-dots">
+                <div class="dot active" data-index="0"></div>
+                <div class="dot" data-index="1"></div>
+                <div class="dot" data-index="2"></div>
+                <div class="dot" data-index="3"></div>
+                <div class="dot" data-index="4"></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="container">
+        <!-- Home Page (default) -->
+        <div id="home-page" class="page-content" >
+            <div class="main-content">
+                <div class="content-section">
+                    <h2 class="section-title">Welcome to the Grand Line!</h2>
+                    <p class="welcome-text">Set sail with us through the world of One Piece! This is your ultimate hub for everything Straw Hat Pirates - from the latest episode breakdowns to deep dives into Devil Fruit lore. Whether you're a rookie fan or a veteran pirate, you'll find treasure here.</p>
+                    
+                    <!-- Featured Episode Section -->
+                    <div class="featured-episode-section">
+                        <h3 class="subsection-title"><i class="fas fa-star"></i> Featured Episode</h3>
+                        <div class="episode-card">
+                            <div class="episode-header" style="background-image: linear-gradient(rgba(0,0,0,0.3), rgba(0,0,0,0.3)), url('https://i.imgur.com/JqYeZvn.jpg')">
+                                <span class="trending-badge">TRENDING</span>
+                                <div class="episode-title">Episode 1071: Gear Five Awakening</div>
+                            </div>
+                            <div class="episode-details">
+                                <div class="meta-info">
+                                    <span><i class="far fa-calendar-alt"></i> Aug 6, 2023</span>
+                                    <span><i class="far fa-clock"></i> 24m</span>
+                                    <span class="view-count"><i class="fas fa-eye"></i> 1.2M views</span>
+                                </div>
+                                <p class="episode-description">In this historic episode, Luffy's Gear Five transformation shakes the world! Witness the stunning animation as Luffy bends reality itself in his climactic battle against Kaido. The animation team delivered a 10-minute uninterrupted fight sequence that's already legendary.</p>
+                                <div class="episode-tags">
+                                    <span class="tag gear-tag">Gear Five</span>
+                                    <span class="tag battle-tag">Kaido Battle</span>
+                                    <span class="tag lore-tag">Awakening</span>
+                                </div>
+                                <div class="action-buttons">
+                                    <button class="watch-button pirate-button">
+                                        <i class="fas fa-play"></i> Watch Now
+                                    </button>
+                                    <button class="discuss-button navy-button">
+                                        <i class="fas fa-comments"></i> Join Discussion
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Community Highlights -->
+                    <div class="community-section">
+                        <h3 class="subsection-title"><i class="fas fa-users"></i> Crew's Quarters</h3>
+                        <div class="highlights-grid">
+                            <!-- Poll Card -->
+                            <div class="highlight-card poll-card">
+                                <div class="card-icon">
+                                    <i class="fas fa-poll"></i>
+                                </div>
+                                <h4>Straw Hat Poll</h4>
+                                <p>Which crew member had the best power-up?</p>
+                                <div class="poll-results">
+                                    <div class="poll-option">
+                                        <div class="option-name">Luffy</div>
+                                        <div class="option-bar" style="width: 65%"></div>
+                                        <div class="option-percent">65%</div>
+                                    </div>
+                                    <div class="poll-option">
+                                        <div class="option-name">Zoro</div>
+                                        <div class="option-bar" style="width: 20%"></div>
+                                        <div class="option-percent">20%</div>
+                                    </div>
+                                    <div class="poll-option">
+                                        <div class="option-name">Sanji</div>
+                                        <div class="option-bar" style="width: 15%"></div>
+                                        <div class="option-percent">15%</div>
+                                    </div>
+                                </div>
+                                <button class="vote-button pirate-button">Cast Your Vote</button>
+                            </div>
+                            
+                            <!-- Theory Card -->
+                            <div class="highlight-card theory-card">
+                                <div class="card-icon">
+                                    <i class="fas fa-scroll"></i>
+                                </div>
+                                <h4>Latest Theory</h4>
+                                <p class="theory-title">The Void Century Connection</p>
+                                <p class="theory-teaser">How Devil Fruits might be tied to the Ancient Weapons...</p>
+                                <a href="#" class="read-more">Read Theory <i class="fas fa-arrow-right"></i></a>
+                            </div>
+                            
+                            <!-- Fan Art Card -->
+                            <div class="highlight-card fanart-card">
+                                <div class="card-icon">
+                                    <i class="fas fa-palette"></i>
+                                </div>
+                                <h4>Featured Fan Art</h4>
+                                <div class="fanart-preview" style="background-image: url('https://i.imgur.com/xYt4z6Q.jpg')"></div>
+                                <p class="artist-name">"Gear Five Awakening" by PirateKing22</p>
+                                <a href="#" class="view-gallery">View Gallery <i class="fas fa-arrow-right"></i></a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="sidebar">
+                    <div class="sidebar-section">
+                        <h2><i class="fas fa-fire"></i> Top Viewed Episodes</h2>
+                        <ul class="ranking-list" id="topEpisodesList">
+                            <li>
+                                <span>Gear Fifth Revealed</span>
+                                <span class="ranking-number">1.2M views</span>
+                            </li>
+                            <li>
+                                <span>Wano Country Finale</span>
+                                <span class="ranking-number">980K views</span>
+                            </li>
+                            <li>
+                                <span>Luffy vs Kaido</span>
+                                <span class="ranking-number">920K views</span>
+                            </li>
+                            <li>
+                                <span>The Five Elders</span>
+                                <span class="ranking-number">890K views</span>
+                            </li>
+                            <li>
+                                <span>Marineford War</span>
+                                <span class="ranking-number">870K views</span>
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="sidebar-section">
+                        <h2><i class="fas fa-star"></i> Popular Characters</h2>
+                        <ul>
+                            <li><a href="">Monkey D. Luffy</a></li>
+                            <li><a href="#">Roronoa Zoro</a></li>
+                            <li><a href="#">Nami</a></li>
+                            <li><a href="#">Sanji</a></li>
+                            <li><a href="#">Trafalgar Law</a></li>
+                        </ul>
+                    </div>
+                    <div class="sidebar-section">
+                        <h2><i class="fas fa-compass"></i> Quick Links</h2>
+                        <ul>
+                            <li><a href="#">Episode Guide</a></li>
+                            <li><a href="#">Character Database</a></li>
+                            <li><a href="#">Devil Fruits</a></li>
+                            <li><a href="#">Crew Rankings</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>        
+    </div>
+        
+<div id="episodes-page" class="page-content" style="display: none;">
+    <div class="main-content">
+        <div class="content-section">
+            <h2 class="section-title"><i class="fas fa-film"></i> Latest Episodes</h2>
+                    
+            <!-- Episode Grid -->
+            <div class="episode-grid" id="episodeList">
+                <!-- Episode cards will be loaded here by JavaScript -->
+                <div class="episode-card">
+                    <div class="episode-thumbnail" style="background-image: url('https://i.imgur.com/JqYeZvn.jpg')">
+                        <div class="episode-badge">NEW</div>
+                        <div class="play-overlay">
+                            <i class="fas fa-play"></i>
+                        </div>
+                    </div>
+                    <div class="episode-info">
+                        <h3>Episode 1071: Gear Five Awakening</h3>
+                        <div class="episode-meta">
+                            <span class="episode-number">#1071</span>
+                            <span class="episode-date">Aug 6, 2023</span>
+                            <span class="episode-views"><i class="fas fa-eye"></i> 1.2M</span>
+                        </div>
+                        <p class="episode-desc">Luffy's Gear Five transformation shakes the world as he battles Kaido in an epic 10-minute uninterrupted fight sequence.</p>
+                        <div class="episode-actions">
+                            <button class="watch-btn pirate-btn-sm">
+                                <i class="fas fa-play"></i> Watch
+                            </button>
+                            <button class="details-btn navy-btn-sm">
+                                <i class="fas fa-info-circle"></i> Details
+                            </button>
+                        </div>
+                    </div>
+                </div> 
+                <!-- More episode cards would be loaded here -->
+            </div>
+            <!-- Discussion Section -->
+            <div class="comments-section">
+                <h2 class="subsection-title"><i class="fas fa-comments"></i> Crew's Discussion</h2>
+                <!-- Comment Form -->
+                <div class="comment-form">
+                    <div class="form-header">
+                        <img src="https://i.imgur.com/4Q3Qv3Y.png" alt="User Icon" class="user-avatar">
+                        <h3>Join the Discussion</h3>
+                    </div>
+                    <textarea id="commentText" placeholder="What did you think of this episode? Share your thoughts with the crew..."></textarea>
+                    <div class="form-footer">
+                        <button id="submitComment" class="pirate-button">
+                            <i class="fas fa-paper-plane"></i> Post Comment
+                        </button>
+                        <div class="char-counter">0/500</div>
+                    </div>
+                </div>
+                        
+                <!-- Comment List -->
+                <div class="comment-list" id="commentList">
+                    <div class="comment-card">
+                        <div class="comment-header">
+                            <img src="https://i.imgur.com/xYt4z6Q.jpg" alt="User" class="comment-avatar">
+                            <div class="comment-user">
+                                <span class="username">StrawHatFan99</span>
+                                <span class="comment-date">2 days ago</span>
+                            </div>
+                            <div class="comment-badge"><i class="fas fa-anchor"></i> Captain</div>
+                        </div>
+                        <div class="comment-body">
+                            <p>That Gear Five transformation was absolutely insane! The animation quality was movie-level. Did anyone else notice the callbacks to earlier arcs in Luffy's movements?</p>
+                        </div>
+                        <div class="comment-actions">
+                            <button class="like-btn"><i class="fas fa-thumbs-up"></i> 42</button>
+                            <button class="reply-btn"><i class="fas fa-reply"></i> Reply</button>
+                        </div>
+                    </div>
+                            
+                    <!-- More comments would be loaded here -->
+                </div>
+            </div>
+        </div>
+                
+        <!-- Sidebar -->
+        <div class="sidebar">
+            <div class="sidebar-section">
+                <h2><i class="fas fa-trophy"></i> Top Episodes</h2>
+                <div class="ranking-container">
+                    <div class="ranked-episode">
+                        <div class="rank-number">1</div>
+                        <div class="rank-content">
+                            <div class="rank-title">Gear Five Awakening</div>
+                            <div class="rank-stats">
+                                <span class="rank-views">1.2M views</span>
+                                <span class="rank-rating"><i class="fas fa-star"></i> 9.8</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="ranked-episode">
+                        <div class="rank-number">2</div>
+                        <div class="rank-content">
+                            <div class="rank-title">Wano Country Finale</div>
+                            <div class="rank-stats">
+                                <span class="rank-views">980K views</span>
+                                <span class="rank-rating"><i class="fas fa-star"></i> 9.6</span>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- More ranked episodes -->
+                </div>
+            </div>
+                    
+            <div class="sidebar-section">
+                <h2><i class="fas fa-play-circle"></i> Watch Now</h2>
+                <div class="platform-grid">
+                    <a href="#" class="platform-card crunchyroll">
+                        <img src="https://i.imgur.com/crunchyroll-logo.png" alt="Crunchyroll">
+                        <span>Crunchyroll</span>
+                    </a>
+                    <a href="#" class="platform-card funimation">
+                        <img src="https://i.imgur.com/funimation-logo.png" alt="Funimation">
+                        <span>Funimation</span>
+                    </a>
+                    <a href="#" class="platform-card netflix">
+                        <img src="https://i.imgur.com/netflix-logo.png" alt="Netflix">
+                        <span>Netflix</span>
+                    </a>
+                    <a href="#" class="platform-card hulu">
+                        <img src="https://i.imgur.com/hulu-logo.png" alt="Hulu">
+                        <span>Hulu</span>
+                    </a>
+                </div>
+            </div>
+                    
+            <div class="sidebar-section">
+                <h2><i class="fas fa-calendar-alt"></i> Coming Soon</h2>
+                <div class="upcoming-episode">
+                    <div class="upcoming-date">Aug 13</div>
+                    <div class="upcoming-title">Episode 1072: The World Reacts</div>
+                    <div class="upcoming-desc">The aftermath of Gear Five sends shockwaves across the world</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>                
+        
+<!-- Characters Page -->
+<div id="characters-page" class="page-content" style="display: none;">
+    <div class="main-content">
+        <div class="content-section">
+            <!-- Hero Banner with Animation -->
+            <div class="character-hero" style="background-image: linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.7)), url('https://i.imgur.com/JqYeZvn.jpg');">
+                <div class="hero-content">
+                    <h1 class="hero-title">Meet the Legends</h1>
+                    <p class="hero-subtitle">Explore the iconic characters of the One Piece universe</p>
+                </div>
+                <div class="scroll-down">
+                    <i class="fas fa-chevron-down"></i>
+                </div>
+            </div>
+            
+            <h2 class="section-title animate-on-scroll">Straw Hat Pirates</h2>
+            <div class="character-grid" id="strawHatCharacters">
+                <!-- Straw Hat characters will be loaded here -->
+            </div>
+            
+            <h2 class="section-title animate-on-scroll" style="margin-top: 50px;">Other Characters</h2>
+            <div class="character-grid" id="otherCharacters">
+                <!-- Other characters will be loaded here -->
+            </div>
+        </div>
+        
+        <div class="sidebar">
+            <div class="sidebar-section floating-card">
+                <h2><i class="fas fa-users"></i> Character Categories</h2>
+                <ul>
+                    <li><a href="#" class="category-link">Straw Hat Pirates</a></li>
+                    <li><a href="#" class="category-link">Marines</a></li>
+                    <li><a href="#" class="category-link">Shichibukai</a></li>
+                    <li><a href="#" class="category-link">Yonko</a></li>
+                    <li><a href="#" class="category-link">Revolutionaries</a></li>
+                    <li><a href="#" class="category-link">Supernovas</a></li>
+                </ul>
+            </div>
+            
+            <div class="sidebar-section floating-card">
+                <h2><i class="fas fa-apple-alt"></i> Popular Devil Fruits</h2>
+                <div class="devil-fruit-gallery">
+                    <div class="fruit-card" data-fruit="gomu">
+                        <img src="images/devil fruit gum gum fruit.jpg" alt="Gomu Gomu no Mi">
+                        <span>Gomu Gomu</span>
+                    </div>
+                    <div class="fruit-card" data-fruit="ope">
+                        <img src="images/devil fruit ope ope mi.jpg" alt="Ope Ope no Mi">
+                        <span>Ope Ope</span>
+                    </div>
+                    <div class="fruit-card" data-fruit="mera">
+                        <img src="images/devil fruit mera mera no mi.jpg" alt="Mera Mera no Mi">
+                        <span>Mera Mera</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="sidebar-section floating-card">
+                <h2><i class="fas fa-question-circle"></i> Did You Know?</h2>
+                <div class="trivia-card">
+                    <p>Luffy's Gear 5 transformation is inspired by the mythical Sun God Nika, a figure from One Piece lore.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+        
+<!-- News Page -->
+<div id="news-page" class="page-content" style="display: none;">
+    <div class="main-content">
+        <div class="content-section">
+            <!-- News Hero Section -->
+            <div class="news-hero" style="background-image: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)), url('https://i.imgur.com/xYt4z6Q.jpg');">
+                <div class="hero-content">
+                    <h1 class="hero-title">One Piece <span class="highlight">News</span></h1>
+                    <p class="hero-subtitle">Stay updated with the latest from the Grand Line</p>
+                    <div class="news-ticker">
+                        <span class="breaking-news">BREAKING:</span>
+                        <marquee>Gear 5 merchandise announced! • One Piece live-action series coming August 31 • Chapter 1089 breaks sales records</marquee>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Featured News -->
+            <div class="featured-news">
+                <h2 class="section-title with-icon"><i class="fas fa-star"></i> Featured Story</h2>
+                <div class="featured-card">
+                    <div class="featured-image" style="background-image: url('https://i.imgur.com/JqYeZvn.jpg');"></div>
+                    <div class="featured-content">
+                        <span class="news-category anime">Anime</span>
+                        <h3>Episode 1071 Breaks Internet with Gear 5 Animation</h3>
+                        <p class="news-excerpt">The long-awaited Gear 5 transformation has sent shockwaves through the One Piece community with its stunning animation quality and faithful adaptation...</p>
+                        <div class="news-meta">
+                            <span><i class="far fa-calendar-alt"></i> August 6, 2023</span>
+                            <span><i class="fas fa-comments"></i> 428 comments</span>
+                        </div>
+                        <button class="read-more-btn">Read Full Story <i class="fas fa-arrow-right"></i></button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- News Grid -->
+            <h2 class="section-title with-icon"><i class="far fa-newspaper"></i> Latest Updates</h2>
+            <div class="news-grid" id="newsList">
+                <!-- News items will be loaded here -->
+            </div>
+        </div>
+        
+        <div class="sidebar">
+            <!-- News Categories with Icons -->
+            <div class="sidebar-section card-3d">
+                <h2><i class="fas fa-tags"></i> News Categories</h2>
+                <ul class="category-list">
+                    <li>
+                        <a href="#">
+                            <i class="fas fa-tv anime-icon"></i>
+                            <span>Anime</span>
+                            <span class="category-count">42</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#">
+                            <i class="fas fa-book manga-icon"></i>
+                            <span>Manga</span>
+                            <span class="category-count">36</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#">
+                            <i class="fas fa-gamepad games-icon"></i>
+                            <span>Games</span>
+                            <span class="category-count">15</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#">
+                            <i class="fas fa-tshirt merch-icon"></i>
+                            <span>Merchandise</span>
+                            <span class="category-count">28</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#">
+                            <i class="fas fa-calendar-alt events-icon"></i>
+                            <span>Events</span>
+                            <span class="category-count">12</span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+            
+            <!-- Newsletter Subscription -->
+            <div class="sidebar-section card-3d newsletter-card">
+                <div class="newsletter-icon">
+                    <i class="fas fa-envelope-open-text"></i>
+                </div>
+                <h2>Join Our Nakama</h2>
+                <p>Get weekly updates delivered to your Den Den Mushi!</p>
+                <div class="newsletter-form">
+                    <input type="email" placeholder="Your email address">
+                    <button class="subscribe-btn">
+                        <span>Subscribe</span>
+                        <i class="fas fa-paper-plane"></i>
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Trending Now -->
+            <div class="sidebar-section card-3d trending-card">
+                <h2><i class="fas fa-fire"></i> Trending Now</h2>
+                <div class="trending-item">
+                    <div class="trending-number">1</div>
+                    <div class="trending-content">
+                        <h4>Gear 5 Theory Roundup</h4>
+                        <p>12.4K discussions</p>
+                    </div>
+                </div>
+                <div class="trending-item">
+                    <div class="trending-number">2</div>
+                    <div class="trending-content">
+                        <h4>Live-Action Cast Reactions</h4>
+                        <p>8.7K discussions</p>
+                    </div>
+                </div>
+                <div class="trending-item">
+                    <div class="trending-number">3</div>
+                    <div class="trending-content">
+                        <h4>Chapter 1089 Predictions</h4>
+                        <p>6.2K discussions</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Forum Page -->
+<div id="forum-page" class="page-content" style="display: none;">
+    <div class="main-content">
+        <div class="content-section">
+            <!-- Forum Hero -->
+            <div class="forum-hero" style="background-image: linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.7)), url('https://i.imgur.com/8kLmExF.png');">
+                <div class="hero-content">
+                    <h1 class="hero-title">Straw Hat <span class="highlight">Forum</span></h1>
+                    <p class="hero-subtitle">Join the crew's discussion about everything One Piece!</p>
+                    <div class="forum-stats">
+                        <div class="stat-item">
+                            <div class="stat-number">24,589</div>
+                            <div class="stat-label">Pirates</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-number">128,763</div>
+                            <div class="stat-label">Topics</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-number">1.2M</div>
+                            <div class="stat-label">Posts</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Forum Topics -->
+            <div class="forum-header">
+                <h2 class="section-title with-icon"><i class="fas fa-comments"></i> Hot Discussions</h2>
+                <button id="newTopicBtn" class="new-topic-btn">
+                    <i class="fas fa-plus"></i> New Topic
+                </button>
+            </div>
+            
+            <div class="forum-topics" id="forumTopics">
+                <!-- Forum topics will be loaded here -->
+            </div>
+            
+            <!-- Pagination -->
+            <div class="pagination">
+                <button class="page-btn active">1</button>
+                <button class="page-btn">2</button>
+                <button class="page-btn">3</button>
+                <button class="page-btn">4</button>
+                <button class="page-btn"><i class="fas fa-chevron-right"></i></button>
+            </div>
+        </div>
+        
+        <div class="sidebar">
+            <!-- Forum Categories -->
+            <div class="sidebar-section card-3d">
+                <h2><i class="fas fa-list"></i> Forum Categories</h2>
+                <ul class="forum-categories">
+                    <li>
+                        <a href="#">
+                            <div class="category-icon anime-cat">
+                                <i class="fas fa-tv"></i>
+                            </div>
+                            <div class="category-info">
+                                <h4>Anime Discussion</h4>
+                                <p>Latest episodes and arcs</p>
+                            </div>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#">
+                            <div class="category-icon manga-cat">
+                                <i class="fas fa-book"></i>
+                            </div>
+                            <div class="category-info">
+                                <h4>Manga Discussion</h4>
+                                <p>Chapter reviews and spoilers</p>
+                            </div>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#">
+                            <div class="category-icon theory-cat">
+                                <i class="fas fa-scroll"></i>
+                            </div>
+                            <div class="category-info">
+                                <h4>Theories</h4>
+                                <p>Predictions and analysis</p>
+                            </div>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#">
+                            <div class="category-icon fanart-cat">
+                                <i class="fas fa-palette"></i>
+                            </div>
+                            <div class="category-info">
+                                <h4>Fan Art</h4>
+                                <p>Showcase your creations</p>
+                            </div>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#">
+                            <div class="category-icon general-cat">
+                                <i class="fas fa-anchor"></i>
+                            </div>
+                            <div class="category-info">
+                                <h4>General Discussion</h4>
+                                <p>Everything else</p>
+                            </div>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+            
+            <!-- Popular Tags -->
+            <div class="sidebar-section card-3d">
+                <h2><i class="fas fa-hashtag"></i> Popular Tags</h2>
+                <div class="tag-cloud">
+                    <a href="#" class="tag tag-lg" style="--tag-color: #d92323;">#Gear5</a>
+                    <a href="#" class="tag" style="--tag-color: #1e3c72;">#Wano</a>
+                    <a href="#" class="tag tag-lg" style="--tag-color: #8E2DE2;">#StrawHats</a>
+                    <a href="#" class="tag" style="--tag-color: #11998e;">#DevilFruit</a>
+                    <a href="#" class="tag" style="--tag-color: #f46b45;">#Marines</a>
+                    <a href="#" class="tag tag-sm" style="--tag-color: #4A00E0;">#Yonko</a>
+                    <a href="#" class="tag" style="--tag-color: #38ef7d;">#Haki</a>
+                    <a href="#" class="tag tag-sm" style="--tag-color: #cd0505;">#Theory</a>
+                </div>
+            </div>
+            
+            <!-- Active Users -->
+            <div class="sidebar-section card-3d active-users">
+                <h2><i class="fas fa-users"></i> Active Pirates</h2>
+                <div class="user-grid">
+                    <div class="user-avatar" data-tooltip="StrawHatFan99">
+                        <img src="https://i.imgur.com/4Q3Qv3Y.png" alt="User">
+                    </div>
+                    <div class="user-avatar" data-tooltip="PirateKing2023">
+                        <img src="https://i.imgur.com/xYt4z6Q.jpg" alt="User">
+                    </div>
+                    <div class="user-avatar" data-tooltip="ZoroTheBest">
+                        <img src="https://i.imgur.com/5XJgZyK.png" alt="User">
+                    </div>
+                    <div class="user-avatar" data-tooltip="NamiSwann">
+                        <img src="https://i.imgur.com/3qXvJ9T.png" alt="User">
+                    </div>
+                    <div class="user-avatar" data-tooltip="SanjiCook">
+                        <img src="https://i.imgur.com/8kLmExF.png" alt="User">
+                    </div>
+                    <div class="user-avatar" data-tooltip="+24 more">
+                        <div class="more-users">+24</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+    
+    <footer>
+        <div class="container">
+            <p>&copy; 2023 One Piece Fan Base. All rights reserved.</p>
+            <p>This is a fan site. One Piece is property of Eiichiro Oda and Shueisha.</p>
+        </div>
+    </footer>
+
+<script>
+        // Sample data
+        const episodes = [
+            {
+                id: 1,
+                title: "Episode 1071: Luffy's Peak - Attained! Gear Five",
+                description: "Luffy awakens his new power and transforms into Gear Five, shocking everyone on the battlefield.",
+                image: "https://via.placeholder.com/300x170?text=Gear+Five",
+                views: 1250000,
+                date: "2023-08-06"
+            },
+            {
+                id: 2,
+                title: "Episode 1070: The World That Loves Luffy! The Final Enemy Is Saturn!",
+                description: "As the battle intensifies, the true enemy reveals themselves - the mysterious Saturn.",
+                image: "https://via.placeholder.com/300x170?text=Saturn+Revealed",
+                views: 980000,
+                date: "2023-07-30"
+            },
+            {
+                id: 3,
+                title: "Episode 1069: A Deadly Gamble! Kuma's Final Wish!",
+                description: "Kuma makes his move as the Straw Hats fight desperately to protect their friends.",
+                image: "https://via.placeholder.com/300x170?text=Kuma's+Wish",
+                views: 920000,
+                date: "2023-07-23"
+            },
+            {
+                id: 4,
+                title: "Episode 1068: The Five Elders' Secret - The Truth About Nika!",
+                description: "The Five Elders discuss the legend of Nika and its connection to Luffy's new powers.",
+                image: "https://via.placeholder.com/300x170?text=Nika+Revealed",
+                views: 890000,
+                date: "2023-07-16"
+            },
+            {
+                id: 5,
+                title: "Episode 1067: The Warrior of Liberation - Luffy's Awakening!",
+                description: "Luffy's body undergoes a mysterious transformation as he reaches his limit against Kaido.",
+                image: "https://via.placeholder.com/300x170?text=Luffy+Awakens",
+                views: 870000,
+                date: "2023-07-09"
+            },
+            {
+                id: 6,
+                title: "Episode 1066: The Legendary Battle - Luffy vs. Kaido!",
+                description: "The climactic battle between Luffy and Kaido reaches its peak as both fighters give it their all.",
+                image: "https://via.placeholder.com/300x170?text=Luffy+vs+Kaido",
+                views: 850000,
+                date: "2023-07-02"
+            }
+        ];
+
+        const characters = [
+            {
+                id: 1,
+                name: "Monkey D. Luffy",
+                role: "Captain",
+                description: "Rubber-powered pirate with dreams of becoming King of the Pirates.",
+                image: "images/Characters/One-Piece-Straw-Hat-Luffy.png"
+            },
+            {
+                id: 2,
+                name: "Roronoa Zoro",
+                role: "Swordsman",
+                description: "Three-sword style master aiming to be the world's greatest swordsman.",
+                image: "images/Characters/one-piece-roronoa-zoro-swordsman-sword-katana-hd-wallpaper-preview.jpg"
+            },
+            {
+                id: 3,
+                name: "Nami",
+                role: "Navigator",
+                description: "Skilled navigator and thief with a dream to map the entire world.",
+                image: "images/Characters/One-Piece-Cat burgler nami.png"
+            },
+            {
+                id: 4,
+                name: "Sanji",
+                role: "Cook",
+                description: "Chivalrous chef with powerful kicking techniques and a passion for cooking.",
+                image: "images/Characters/one-piece-sanji.jpg"
+            },
+            {
+                id: 5,
+                name: "Tony Tony Chopper",
+                role: "Doctor",
+                description: "Reindeer with the Human-Human Fruit who serves as the crew's doctor.",
+                image: "images/Characters/one-piece-Tony Tony Chopper.jpg"
+            },
+            {
+                id: 6,
+                name: "Nico Robin",
+                role: "Archaeologist",
+                description: "Scholar who can read Poneglyphs and the sole survivor of Ohara.",
+                image: "images/Characters/one-piece-Nico Robin.jpg"
+            },
+            {
+                id: 7,
+                name: "Franky",
+                role: "Shipwright",
+                description: "Cyborg shipwright who built the Thousand Sunny and loves cola.",
+                image: "images/Characters/one-piece-franky.jpg"
+            },
+            {
+                id: 8,
+                name: "Brook",
+                role: "Musician",
+                description: "Living skeleton musician who ate the Revive-Revive Fruit.",
+                image: "images/Characters/One-Piece-soul king brook.png"
+            },
+            {
+                id: 9,
+                name: "Jimbei",
+                role: "Helmsman",
+                description: "Fishman karate master and former Warlord who serves as helmsman.",
+                image: "images/Characters/One-Piece-First son of the sea jinbe.png"
+            },
+            {
+                id: 10,
+                name: "Trafalgar Law",
+                role: "Captain of Heart Pirates",
+                description: "Surgeon of Death with the Ope Ope no Mi powers.",
+                image: "https://via.placeholder.com/200x300?text=Law"
+            },
+            {
+                id: 11,
+                name: "Boa Hancock",
+                role: "Pirate Empress",
+                description: "Captain of the Kuja Pirates and former Warlord with the Love-Love Fruit.",
+                image: "https://via.placeholder.com/200x300?text=Hancock"
+            },
+            {
+                id: 12,
+                name: "Kaido",
+                role: "Yonko",
+                description: "Strongest creature in the world and captain of the Beast Pirates.",
+                image: "https://via.placeholder.com/200x300?text=Kaido"
+            }
+        ];
+
+        const news = [
+            {
+                id: 1,
+                title: "One Piece Episode 1071 Breaks Viewership Records",
+                content: "The highly anticipated episode featuring Luffy's Gear Five transformation has set new records for viewership, becoming the most-watched episode in One Piece history.",
+                date: "2023-08-08",
+                category: "Anime"
+            },
+            {
+                id: 2,
+                title: "Eiichiro Oda Announces Short Break for Health Reasons",
+                content: "The creator of One Piece will be taking a one-month break from the manga to rest and recover. The series will resume in September.",
+                date: "2023-08-01",
+                category: "Manga"
+            },
+            {
+                id: 3,
+                title: "New One Piece Video Game Announced for 2024",
+                content: "Bandai Namco has revealed a new One Piece RPG set for release next year, featuring an original story supervised by Eiichiro Oda.",
+                date: "2023-07-25",
+                category: "Games"
+            },
+            {
+                id: 4,
+                title: "One Piece Live-Action Series Gets Release Date",
+                content: "Netflix has announced that the live-action adaptation of One Piece will premiere on August 31, 2023.",
+                date: "2023-07-18",
+                category: "Anime"
+            },
+            {
+                id: 5,
+                title: "Limited Edition Gear Five Merchandise Coming Soon",
+                content: "To celebrate Luffy's new transformation, official merchandise including figures, shirts, and posters will be available starting next month.",
+                date: "2023-07-10",
+                category: "Merchandise"
+            }
+        ];
+
+        const forumTopics = [
+            {
+                id: 1,
+                title: "Gear Five Discussion - Theories and Reactions",
+                author: "StrawHatFan99",
+                date: "2023-08-07",
+                replies: 342,
+                views: 12000,
+                category: "Anime Discussion"
+            },
+            {
+                id: 2,
+                title: "Who is the Final Villain of One Piece?",
+                author: "PirateKing2023",
+                date: "2023-08-05",
+                replies: 215,
+                views: 8500,
+                category: "Theories"
+            },
+            {
+                id: 3,
+                title: "Chapter 1089 Spoilers Discussion",
+                author: "MangaReader",
+                date: "2023-08-02",
+                replies: 178,
+                views: 7200,
+                category: "Manga Discussion"
+            },
+            {
+                id: 4,
+                title: "My One Piece Cosplay Collection",
+                author: "CosplayQueen",
+                date: "2023-07-28",
+                replies: 89,
+                views: 4500,
+                category: "Cosplay"
+            },
+            {
+                id: 5,
+                title: "What Devil Fruit Would You Want in Real Life?",
+                author: "DFEnthusiast",
+                date: "2023-07-25",
+                replies: 156,
+                views: 6800,
+                category: "General Discussion"
+            }
+        ];
+
+        let comments = [
+            {
+                id: 1,
+                user: "StrawHatFan99",
+                text: "Gear Five was absolutely insane! Oda outdid himself with this transformation.",
+                date: "2023-08-15"
+            },
+            {
+                id: 2,
+                user: "PirateKing2023",
+                text: "I've been waiting for this moment since I started watching One Piece 10 years ago!",
+                date: "2023-08-14"
+            },
+            {
+                id: 3,
+                user: "ZoroTheBest",
+                text: "While Luffy's new form is cool, I'm more excited to see Zoro's next power-up!",
+                date: "2023-08-13"
+            }
+        ];
+
+        // Current user state
+        let currentUser = null;
+
+            function showPage(page) {
+            // Hide all pages
+            document.querySelectorAll('.page-content').forEach(p => {
+                p.style.display = 'none';
+            });
+            
+            // Show requested page
+            document.getElementById(`${page}-page`).style.display = 'block';
+            }
+            
+            // Update your existing modal event listeners
+            document.getElementById('loginBtn').addEventListener('click', () => {
+                document.getElementById('signupModal').style.display = 'none';
+                document.getElementById('loginModal').style.display = 'block';
+            });
+
+            document.getElementById('signupBtn').addEventListener('click', () => {
+                document.getElementById('loginModal').style.display = 'none';
+                document.getElementById('signupModal').style.display = 'block';
+            });
+
+            document.getElementById('closeLogin').addEventListener('click', () => {
+                document.getElementById('loginModal').style.display = 'none';
+            });
+
+            document.getElementById('closeSignup').addEventListener('click', () => {
+                document.getElementById('signupModal').style.display = 'none';
+            });
+
+            document.getElementById('switchToSignup').addEventListener('click', (e) => {
+                e.preventDefault();
+                document.getElementById('loginModal').style.display = 'none';
+                document.getElementById('signupModal').style.display = 'block';
+            });
+
+            document.getElementById('switchToLogin').addEventListener('click', (e) => {
+                e.preventDefault();
+                document.getElementById('signupModal').style.display = 'none';
+                document.getElementById('loginModal').style.display = 'block';
+            });
+
+            // Close modal when clicking outside
+            window.addEventListener('click', (e) => {
+                if (e.target === document.getElementById('loginModal')) {
+                    document.getElementById('loginModal').style.display = 'none';
+                }
+                if (e.target === document.getElementById('signupModal')) {
+                    document.getElementById('signupModal').style.display = 'none';
+                }
+            });
+
+            document.addEventListener('DOMContentLoaded', function() {
+            const slides = document.querySelectorAll('.slide');
+            const dots = document.querySelectorAll('.dot');
+            const prevArrow = document.querySelector('.prev-arrow');
+            const nextArrow = document.querySelector('.next-arrow');
+            let currentIndex = 0;
+            let autoSlideInterval;
+            
+            // Set up initial positions
+            function updateSlides() {
+                slides.forEach((slide, index) => {
+                    slide.classList.remove('active', 'prev', 'next', 'far-prev', 'far-next');
+                    
+                    if (index === currentIndex) {
+                        slide.classList.add('active');
+                    } else if (index === (currentIndex + 1) % slides.length) {
+                        slide.classList.add('next');
+                    } else if (index === (currentIndex + 2) % slides.length) {
+                        slide.classList.add('far-next');
+                    } else if (index === (currentIndex - 1 + slides.length) % slides.length) {
+                        slide.classList.add('prev');
+                    } else if (index === (currentIndex - 2 + slides.length) % slides.length) {
+                        slide.classList.add('far-prev');
+                    }
+                });
+                
+                // Update dots
+                dots.forEach((dot, index) => {
+                    dot.classList.toggle('active', index === currentIndex);
+                });
+            }
+            
+            // Go to specific slide
+            function goToSlide(index) {
+                currentIndex = (index + slides.length) % slides.length;
+                updateSlides();
+                resetAutoSlide();
+            }
+            
+            // Next slide
+            function nextSlide() {
+                goToSlide(currentIndex + 1);
+            }
+            
+            // Previous slide
+            function prevSlide() {
+                goToSlide(currentIndex - 1);
+            }
+            
+            // Auto slide
+            function startAutoSlide() {
+                autoSlideInterval = setInterval(nextSlide, 5000);
+            }
+            
+            function resetAutoSlide() {
+                clearInterval(autoSlideInterval);
+                startAutoSlide();
+            }
+            
+            // Event listeners
+            nextArrow.addEventListener('click', nextSlide);
+            prevArrow.addEventListener('click', prevSlide);
+            
+            dots.forEach(dot => {
+                dot.addEventListener('click', function() {
+                    goToSlide(parseInt(this.getAttribute('data-index')));
+                });
+            });
+            
+            // Keyboard navigation
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'ArrowRight') {
+                    nextSlide();
+                } else if (e.key === 'ArrowLeft') {
+                    prevSlide();
+                }
+            });
+            
+            // Crazy hover effects
+            slides.forEach(slide => {
+                slide.addEventListener('mousemove', (e) => {
+                    if (slide.classList.contains('active')) {
+                        const xAxis = (window.innerWidth / 2 - e.pageX) / 25;
+                        const yAxis = (window.innerHeight / 2 - e.pageY) / 25;
+                        slide.style.transform = `translateZ(0) rotateY(${xAxis}deg) rotateX(${yAxis}deg)`;
+                    }
+                });
+                
+                slide.addEventListener('mouseenter', () => {
+                    if (slide.classList.contains('active')) {
+                        slide.style.transition = 'none';
+                    }
+                });
+                
+                slide.addEventListener('mouseleave', () => {
+                    if (slide.classList.contains('active')) {
+                        slide.style.transition = 'transform 1s';
+                        slide.style.transform = 'translateZ(0) rotateY(0deg) rotateX(0deg)';
+                    }
+                });
+            });
+            
+            // Initialize
+            updateSlides();
+            startAutoSlide();
+            
+            // Parallax effect for background
+            document.addEventListener('mousemove', function(e) {
+                const x = e.clientX / window.innerWidth;
+                const y = e.clientY / window.innerHeight;
+                
+                slides.forEach(slide => {
+                    if (slide.classList.contains('active')) {
+                        const bgPosX = x * 20 - 10;
+                        const bgPosY = y * 20 - 10;
+                        slide.style.backgroundPosition = `${bgPosX}px ${bgPosY}px`;
+                    }
+                });
+            });
+        });
+
+        // Update your existing DOMContentLoaded event listener
+    document.addEventListener('DOMContentLoaded', function() {
+    // ... (keep your existing code)
+
+    // Navbar navigation
+    const navLinks = document.querySelectorAll('.nav-link');
+    navLinks.forEach(link => {
+        link.addEventListener('click', function(e) {
+            e.preventDefault();
+            const page = this.getAttribute('data-page');
+            showPage(page);
+            
+            // Close mobile menu if open
+            document.getElementById('nav-links').classList.remove('show');
+            document.getElementById('hamburger').classList.remove('open');
+            
+            // Load appropriate content
+            switch(page) {
+                case 'home':
+                    loadHomeContent();
+                    break;
+                case 'episodes':
+                    loadEpisodes();
+                    loadComments();
+                    break;
+                case 'characters':
+                    loadCharacters();
+                    break;
+                case 'news':
+                    loadNews();
+                    break;
+                case 'forum':
+                    loadForumTopics();
+                    break;
+            }
+        });
+    });
+
+        // Mobile menu toggle
+        const hamburger = document.getElementById('hamburger');
+        const mobileNavLinks = document.getElementById('nav-links');
+        
+        hamburger.addEventListener('click', () => {
+            mobileNavLinks.classList.toggle('show');
+            hamburger.classList.toggle('open');
+        });
+    });
+
+    // Sidebar hover effects
+    document.querySelectorAll('.sidebar-section').forEach(section => {
+        section.addEventListener('mouseenter', () => {
+            section.style.transform = 'translateZ(10px)';
+            section.style.zIndex = '10';
+        });
+        
+        section.addEventListener('mouseleave', () => {
+            section.style.transform = 'translateZ(0)';
+            section.style.zIndex = '1';
+        });
+    });
+
+    // Ripple effect for sidebar items
+    document.querySelectorAll('.sidebar ul li').forEach(item => {
+        item.addEventListener('click', function(e) {
+            const ripple = document.createElement('span');
+            ripple.className = 'ripple';
+            
+            const rect = this.getBoundingClientRect();
+            const size = Math.max(rect.width, rect.height);
+            const x = e.clientX - rect.left - size/2;
+            const y = e.clientY - rect.top - size/2;
+            
+            ripple.style.width = ripple.style.height = `${size}px`;
+            ripple.style.left = `${x}px`;
+            ripple.style.top = `${y}px`;
+            ripple.style.backgroundColor = 'rgba(255, 255, 255, 0.2)';
+            
+            this.appendChild(ripple);
+            
+            setTimeout(() => {
+                ripple.remove();
+            }, 600);
+        });
+    });
+    // Add these functions to your script
+    function loadHomeContent() {
+        // Home content is already loaded
+    }
+
+    function loadEpisodes() {
+        const episodeList = document.getElementById('episodeList');
+        // Clear existing content
+        episodeList.innerHTML = '';
+        
+        // Add episodes from your data
+        episodes.forEach(episode => {
+            const episodeCard = document.createElement('div');
+            episodeCard.className = 'episode-card';
+            episodeCard.innerHTML = `
+                <div class="episode-thumbnail" style="background-image: url('${episode.image}')">
+                    <div class="play-overlay">
+                        <i class="fas fa-play"></i>
+                    </div>
+                </div>
+                <div class="episode-info">
+                    <h3>${episode.title}</h3>
+                    <div class="episode-meta">
+                        <span class="episode-date">${episode.date}</span>
+                        <span class="episode-views"><i class="fas fa-eye"></i> ${episode.views.toLocaleString()}</span>
+                    </div>
+                    <p class="episode-desc">${episode.description}</p>
+                    <div class="episode-actions">
+                        <button class="pirate-btn-sm"><i class="fas fa-play"></i> Watch</button>
+                        <button class="navy-btn-sm"><i class="fas fa-info-circle"></i> Details</button>
+                    </div>
+                </div>
+            `;
+            episodeList.appendChild(episodeCard);
+        });
+    }
+
+    function loadCharacters() {
+        const strawHatCharacters = document.getElementById('strawHatCharacters');
+        const otherCharacters = document.getElementById('otherCharacters');
+        
+        // Clear existing content
+        strawHatCharacters.innerHTML = '';
+        otherCharacters.innerHTML = '';
+        
+        // Add characters (first 9 are Straw Hats in your data)
+        characters.slice(0, 9).forEach(character => {
+            const characterCard = document.createElement('div');
+            characterCard.className = 'character-card';
+            characterCard.innerHTML = `
+                <div class="character-image" style="background-image: url('${character.image}')"></div>
+                <div class="character-info">
+                    <h3>${character.name}</h3>
+                    <p>${character.role}</p>
+                    <p>${character.description}</p>
+                </div>
+            `;
+            strawHatCharacters.appendChild(characterCard);
+    });
+    
+    // Add other characters
+    characters.slice(9).forEach(character => {
+        const characterCard = document.createElement('div');
+        characterCard.className = 'character-card';
+        characterCard.innerHTML = `
+            <div class="character-image" style="background-image: url('${character.image}')"></div>
+            <div class="character-info">
+                <h3>${character.name}</h3>
+                <p>${character.role}</p>
+                <p>${character.description}</p>
+            </div>
+        `;
+        otherCharacters.appendChild(characterCard);
+    });
+    }
+
+    function loadNews() {
+        const newsList = document.getElementById('newsList');
+        newsList.innerHTML = '';
+        
+        news.forEach(item => {
+            const newsItem = document.createElement('div');
+            newsItem.className = 'news-item';
+            newsItem.innerHTML = `
+                <h3>${item.title}</h3>
+                <div class="news-date">${item.date} • ${item.category}</div>
+                <p>${item.content}</p>
+                <a href="#" class="read-more">Read more <i class="fas fa-arrow-right"></i></a>
+            `;
+            newsList.appendChild(newsItem);
+        });
+    }
+
+    function loadForumTopics() {
+        const forumTopicsList = document.getElementById('forumTopics');
+        forumTopicsList.innerHTML = '';
+        
+        forumTopics.forEach(topic => {
+            const topicDiv = document.createElement('div');
+            topicDiv.className = 'forum-topic';
+            topicDiv.innerHTML = `
+                <h3>${topic.title}</h3>
+                <div class="forum-topic-meta">
+                    Posted by ${topic.author} on ${topic.date} • ${topic.category}
+                </div>
+                <div class="forum-topic-stats">
+                    <span><i class="fas fa-comment"></i> ${topic.replies} replies</span>
+                    <span><i class="fas fa-eye"></i> ${topic.views} views</span>
+                </div>
+            `;
+            forumTopicsList.appendChild(topicDiv);
+        });
+    }
+
+    function loadComments() {
+        const commentList = document.getElementById('commentList');
+        commentList.innerHTML = '';
+        
+        comments.forEach(comment => {
+            const commentCard = document.createElement('div');
+            commentCard.className = 'comment-card';
+            commentCard.innerHTML = `
+                <div class="comment-header">
+                    <img src="https://via.placeholder.com/40x40?text=${comment.user.charAt(0)}" class="comment-avatar">
+                    <div class="comment-user">
+                        <span class="username">${comment.user}</span>
+                        <span class="comment-date">${comment.date}</span>
+                    </div>
+                </div>
+                <div class="comment-body">
+                    <p>${comment.text}</p>
+                </div>
+                <div class="comment-actions">
+                    <button class="like-btn"><i class="fas fa-thumbs-up"></i> Like</button>
+                    <button class="reply-btn"><i class="fas fa-reply"></i> Reply</button>
+                </div>
+            `;
+            commentList.appendChild(commentCard);
+        });
+    }
+    document.addEventListener('DOMContentLoaded', function() {
+        // ... existing code ...
+        
+        // Load initial content
+        loadHomeContent();
+    });
+    // Add this to your existing JavaScript
+    function loadCharacters() {
+        const strawHatCharacters = document.getElementById('strawHatCharacters');
+        const otherCharacters = document.getElementById('otherCharacters');
+        
+        // Clear existing content
+        strawHatCharacters.innerHTML = '';
+        otherCharacters.innerHTML = '';
+        
+        // Add characters (first 9 are Straw Hats in your data)
+        characters.slice(0, 9).forEach((character, index) => {
+            const characterCard = document.createElement('div');
+            characterCard.className = 'character-card';
+            characterCard.style.animationDelay = `${index * 0.1}s`;
+            characterCard.innerHTML = `
+                <div class="character-image" style="background-image: url('${character.image}')"></div>
+                <div class="character-info">
+                    <h3>${character.name}</h3>
+                    <p><strong>${character.role}</strong></p>
+                    <p>${character.description}</p>
+                </div>
+            `;
+            strawHatCharacters.appendChild(characterCard);
+            
+            // Trigger animation after a slight delay
+            setTimeout(() => {
+                characterCard.classList.add('animate');
+            }, 100);
+        });
+        
+        // Add other characters
+        characters.slice(9).forEach((character, index) => {
+            const characterCard = document.createElement('div');
+            characterCard.className = 'character-card';
+            characterCard.style.animationDelay = `${index * 0.1}s`;
+            characterCard.innerHTML = `
+                <div class="character-image" style="background-image: url('${character.image}')"></div>
+                <div class="character-info">
+                    <h3>${character.name}</h3>
+                    <p><strong>${character.role}</strong></p>
+                    <p>${character.description}</p>
+                </div>
+            `;
+            otherCharacters.appendChild(characterCard);
+            
+            // Trigger animation after a slight delay
+            setTimeout(() => {
+                characterCard.classList.add('animate');
+            }, 100);
+        });
+        
+        // Add scroll animations
+        setupScrollAnimations();
+    }
+    
+    function setupScrollAnimations() {
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('animate-on-scroll-visible');
+                }
+            });
+        }, { threshold: 0.1 });
+        
+        document.querySelectorAll('.animate-on-scroll').forEach(element => {
+            observer.observe(element);
+        });
+    }
+    
+    // Add this to your existing DOMContentLoaded event
+    document.addEventListener('DOMContentLoaded', function() {
+        // ... existing code ...
+        
+        // Add hover effects to fruit cards
+        document.querySelectorAll('.fruit-card').forEach(card => {
+            card.addEventListener('mouseenter', () => {
+                const fruitType = card.getAttribute('data-fruit');
+                let glowColor = '#d92323'; // default red
+                
+                switch(fruitType) {
+                    case 'gomu':
+                        glowColor = '#FF5722'; // orange
+                        break;
+                    case 'ope':
+                        glowColor = '#9C27B0'; // purple
+                        break;
+                    case 'mera':
+                        glowColor = '#FF9800'; // amber
+                        break;
+                }
+                
+                card.style.boxShadow = `0 0 15px ${glowColor}`;
+            });
+            
+            card.addEventListener('mouseleave', () => {
+                card.style.boxShadow = 'none';
+            });
+        });
+    });
+    // Enhanced JavaScript for News and Forum pages
+    function loadNews() {
+        const newsList = document.getElementById('newsList');
+        newsList.innerHTML = '';
+        
+        news.forEach((item, index) => {
+            const newsItem = document.createElement('div');
+            newsItem.className = 'news-item';
+            newsItem.style.animationDelay = `${index * 0.1}s`;
+            newsItem.innerHTML = `
+                <div class="news-item-image" style="background-image: url('${item.image || 'https://via.placeholder.com/350x200?text=One+Piece+News'}')"></div>
+                <div class="news-item-content">
+                    <span class="news-category ${item.category.toLowerCase()}">${item.category}</span>
+                    <h3>${item.title}</h3>
+                    <p>${item.content.substring(0, 150)}...</p>
+                    <div class="news-meta">
+                        <span><i class="far fa-calendar-alt"></i> ${item.date}</span>
+                        <span><i class="fas fa-comments"></i> ${Math.floor(Math.random() * 100)} comments</span>
+                    </div>
+                    <button class="read-more-btn">Read More <i class="fas fa-arrow-right"></i></button>
+                </div>
+            `;
+            newsList.appendChild(newsItem);
+            
+            // Add animation class after a delay
+            setTimeout(() => {
+                newsItem.classList.add('animate');
+            }, 100);
+        });
+    }
+    
+    function loadForumTopics() {
+    const forumTopics = document.getElementById('forumTopics');
+    forumTopics.innerHTML = '';
+    
+    forumTopicsData.forEach((topic, index) => {
+        const topicCard = document.createElement('div');
+        topicCard.className = 'topic-card';
+        topicCard.style.animationDelay = `${index * 0.1}s`;
+        topicCard.innerHTML = `
+            <div class="topic-avatar" style="background-image: url('https://i.imgur.com/${['4Q3Qv3Y', 'xYt4z6Q', '5XJgZyK', '3qXvJ9T', '8kLmExF'][index % 5]}.png')"></div>
+            <div class="topic-content">
+                <h3 class="topic-title">${topic.title}</h3>
+                <div class="topic-meta">
+                    <span>Posted by ${topic.author}</span>
+                    <span>${topic.date}</span>
+                    <span>${topic.category}</span>
+                </div>
+                <div class="topic-stats">
+                    <div class="topic-stat"><i class="fas fa-comment"></i> ${topic.replies} replies</div>
+                    <div class="topic-stat"><i class="fas fa-eye"></i> ${topic.views} views</div>
+                    <div class="topic-stat"><i class="fas fa-heart"></i> ${Math.floor(topic.views / 20)} likes</div>
+                </div>
+            </div>
+        `;
+        forumTopics.appendChild(topicCard);
+        
+        // Add animation class after a delay
+        setTimeout(() => {
+            topicCard.classList.add('animate');
+        }, 50);
+    }); // <-- Missing closing parenthesis for forEach!
+
+} // <-- Missing closing brace for the function
+// Update your existing script with API calls
+
+const API_BASE_URL = 'https://your-app-name.up.railway.app/api';
+
+// Example: Fetch episodes
+async function loadEpisodes() {
+  try {
+    const response = await fetch(`${API_BASE_URL}/episodes`);
+    const episodes = await response.json();
+    
+    const episodeList = document.getElementById('episodeList');
+    episodeList.innerHTML = '';
+    
+    episodes.forEach(episode => {
+      const episodeCard = document.createElement('div');
+      episodeCard.className = 'episode-card';
+      episodeCard.innerHTML = `
+        <div class="episode-thumbnail" style="background-image: url('${episode.thumbnail}')">
+          <div class="play-overlay">
+            <i class="fas fa-play"></i>
+          </div>
+        </div>
+        <div class="episode-info">
+          <h3>${episode.title}</h3>
+          <div class="episode-meta">
+            <span class="episode-date">${new Date(episode.releaseDate).toLocaleDateString()}</span>
+            <span class="episode-views"><i class="fas fa-eye"></i> ${episode.views.toLocaleString()}</span>
+          </div>
+          <p class="episode-desc">${episode.description}</p>
+          <div class="episode-actions">
+            <button class="pirate-btn-sm"><i class="fas fa-play"></i> Watch</button>
+            <button class="navy-btn-sm"><i class="fas fa-info-circle"></i> Details</button>
+          </div>
+        </div>
+      `;
+      episodeList.appendChild(episodeCard);
+    });
+  } catch (error) {
+    console.error('Error loading episodes:', error);
+  }
+}
+// Example: Authentication
+async function login(email, password) {
+  try {
+    const response = await fetch(`${API_BASE_URL}/auth/login`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ email, password })
+    });
+    
+    if (!response.ok) {
+      throw new Error('Login failed');
+    }
+    
+    const { user, token } = await response.json();
+    localStorage.setItem('token', token);
+    return user;
+  } catch (error) {
+    console.error('Login error:', error);
+    throw error;
+  }
+}
+
+// Example: Post a comment
+async function postComment(content, parentType, parentId) {
+  try {
+    const token = localStorage.getItem('token');
+    const response = await fetch(`${API_BASE_URL}/comments`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      },
+      body: JSON.stringify({ content, parentType, parentId })
+    });
+    
+    if (!response.ok) {
+      throw new Error('Failed to post comment');
+    }
+    
+    return await response.json();
+  } catch (error) {
+    console.error('Comment error:', error);
+    throw error;
+  }
+}
+
+// Update your existing event listeners to use these functions
+document.addEventListener('DOMContentLoaded', async () => {
+  // Load initial data
+  await loadEpisodes();
+  
+  // Example login form submission
+  document.getElementById('loginForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const email = document.getElementById('loginEmail').value;
+    const password = document.getElementById('loginPassword').value;
+    
+    try {
+      const user = await login(email, password);
+      // Update UI to show logged in state
+      document.getElementById('loginModal').style.display = 'none';
+      document.getElementById('userAvatar').src = user.avatar;
+      document.getElementById('userName').textContent = user.username;
+      document.getElementById('authButtons').style.display = 'none';
+      document.getElementById('userMenu').style.display = 'block';
+    } catch (error) {
+      alert('Login failed: ' + error.message);
+    }
+  });
+  
+  // Example comment submission
+  document.getElementById('commentForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const content = document.getElementById('commentText').value;
+    
+    try {
+      await postComment(content, 'Episode', 'current-episode-id');
+      document.getElementById('commentText').value = '';
+      await loadComments(); // Refresh comments
+    } catch (error) {
+      alert('Failed to post comment: ' + error.message);
+    }
+  });
+});
+
+</script>
+</body>
+</html>
