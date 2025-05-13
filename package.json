@@ -5,6 +5,7 @@
     "main": "server.js",
     "scripts": {
       "start": "node server.js",
+        "preinstall": "npx npm-force-resolutions",
       "dev": "nodemon server.js"
     },
     "dependencies": {
